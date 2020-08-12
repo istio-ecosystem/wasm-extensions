@@ -6,28 +6,30 @@ can detect SQL injection. The rules for detection are aligned with ModSecurity
 rules [942100](https://github.com/coreruleset/coreruleset/blob/v3.3/dev/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf#L45) and [942101](https://github.com/coreruleset/coreruleset/blob/v3.3/dev/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf#L1458), and SQL injection is detected with methods from
 [libinjection](https://github.com/client9/libinjection).
 
-## Environment
-Read ENVIRONMENT.md to set up the necessary environment for envoy proxy.
-
 ## Deployment
-From the root of the repository, build static binary of envoy proxy:
 
-```bazel build -c opt //source/exe:envoy-static```
+The source code for the WASM extension is in `wasm`. From the root of this repository, build the WASM module with:
 
-Run tests for envoy to make sure the binary has been built successfully:
-
-```bazel test //test/common/common/...```
-
-Before building the WASM module, make sure the [libinjection repository](https://github.com/client9/libinjection) is checked out in the parent directory of this envoy-wasm repository.
-
-The source code for the WASM extension is in `examples/wasm`. From the root of this repository, build the WASM module with:
-
-```bazel build //examples/wasm:envoy_filter_http_wasm_example.wasm```
+```
+bazel build //wasm:envoy_filter_http_wasm_example.wasm
+```
 
 The WASM binary being built will be at
-`bazel-bin/examples/wasm/envoy_filter_http_wasm_example.wasm`. Make sure that the `filename` path in `examples/wasm/envoy.yaml` matches the path to the WASM binary. Then run the WASM module:
-
-```bazel-bin/source/exe/envoy-static -l trace --concurrency 1 -c `` `pwd`/examples/wasm/envoy.yaml`` ```
+`bazel-bin/wasm/envoy_filter_http_wasm_example.wasm`.  
+We will mount the WASM module onto the docker image of Istio proxy.
+```
+docker pull istio/proxyv2:1.7.0-beta.2
+```
+Then run the image with WASM configured:
+```
+docker run \
+-v ~/WAF-wasm/envoy-config.yaml:/etc/envoy-config.yaml \
+-v ~/WAF-wasm/bazel-bin/wasm/envoy_filter_http_wasm_example.wasm:/etc/envoy_filter_http_wasm_example.wasm \
+-p 8000:8000 \
+--entrypoint /usr/local/bin/envoy \
+istio/proxyv2:1.7.0-beta.2 -l trace --concurrency 1 -c /etc/envoy-config.yaml
+```
+(This does not quite work yet. It seems that the envoy proxy is running without the wasm module.)
 
 In a separate terminal, curl at `localhost:8000` to interact with the running proxy. For example, if you type the following command, you will receive a response with HTTP code 200 Okay, indicating that the request has passed SQL injection detection.
 ``` curl -d "hello world" -v localhost:8000```
