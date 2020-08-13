@@ -39,10 +39,14 @@ istio/proxyv2:1.7.0-beta.2 -l trace --concurrency 1 -c /etc/envoy-config.yaml
 (This does not quite work yet. It seems that the envoy proxy is running without the wasm module.)
 
 In a separate terminal, curl at `localhost:8000` to interact with the running proxy. For example, if you type the following command, you will receive a response with HTTP code 200 Okay, indicating that the request has passed SQL injection detection.
-``` curl -d "hello world" -v localhost:8000```
+```
+curl -d "hello world" -v localhost:8000
+```
 If you instead put something suspicious in the body, for example, enter the
 following command:
-``` curl -d "val=-1%27+and+1%3D1%0D%0A" -v localhost:8000```
+```
+curl -d "val=-1%27+and+1%3D1%0D%0A" -v localhost:8000
+```
 You will receive a response with HTTP code 403 Forbidden. The body of the http
 request above has the parameter `val` with the value `-1' and 1=1` in URL
 encoding.
@@ -66,6 +70,7 @@ in the yaml file in JSON syntax as below:
     }
 }
 ```
+
 There are three parts that can be configured for now: query parameters(`query_param`), cookies(`cookie`, not shown above), and
     headers(`header`). Configuration for all three
     parts are optional. If nothing is passed in a
@@ -76,7 +81,7 @@ There are three parts that can be configured for now: query parameters(`query_pa
     updated later.
 
 ### Query Parameters
-    The "Content-Type" field is required in query
+The "Content-Type" field is required in query
     parameters configuration, Currently, the WASM
     module only supports SQL injection detection
     for the content type
@@ -85,7 +90,7 @@ There are three parts that can be configured for now: query parameters(`query_pa
     incoming http request has a different content
     type, detection on its body will be skipped.
 
-    In default setting, all query parameter names
+In default setting, all query parameter names
     and values will be checked for SQL injection.
     To change this setting, you can either add an
     `include` or an `exclude` field. Both take a
@@ -97,7 +102,7 @@ There are three parts that can be configured for now: query parameters(`query_pa
     present at the same time.
 
 ### Headers
-    In default setting, the `Referrer` and
+In default setting, the `Referrer` and
     `User-Agent` headers will be checked for SQL
     injection. The `include` and `exclude` fields
     work similarly as above, except that `Referrer`
@@ -105,7 +110,7 @@ There are three parts that can be configured for now: query parameters(`query_pa
     explicitly enlisted in `exlude`.
 
 ### Cookies
-    In default setting, all cookie names will be
+In default setting, all cookie names will be
     checked. `include` and `exclude` work exactly
     the same as for query parameters.
 
