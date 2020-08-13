@@ -18,7 +18,7 @@ and SQL injection is detected with methods from
 From the root of this repository, build the WASM module with:
 
 ```
-bazel build //:envoy_filter_http_wasm_example.wasm
+bazel build //:WAF_wasm.wasm
 ```
 
 The WASM binary being built will be at
@@ -31,7 +31,7 @@ Then run the image with WASM configured:
 ```
 docker run \
 -v ~/WAF-wasm/envoy-config.yaml:/etc/envoy-config.yaml \
--v ~/WAF-wasm/bazel-bin/envoy_filter_http_wasm_example.wasm:/etc/envoy_filter_http_wasm_example.wasm \
+-v ~/WAF-wasm/bazel-bin/WAF_wasm.wasm:/etc/WAF_wasm.wasm \
 -p 8000:8000 \
 --entrypoint /usr/local/bin/envoy \
 istio/proxyv2:1.7.0-beta.2 -l trace --concurrency 1 -c /etc/envoy-config.yaml
@@ -53,19 +53,19 @@ encoding.
 
 ## Configuration
 The rules for SQL injection detection can be configured from YAML files. An
-example of configuration can be found in `examples/wasm/envoy-config.yaml`.
+example of configuration can be found in `envoy-config.yaml`.
 Configuration are passsed through the field `config.config.configuration.value`
 in the yaml file in JSON syntax as below:
 
 ```
 {
   “query_param”: {
-# detect sqli on all parameters but “foo”
+    # detect sqli on all parameters but “foo”
     “Content-Type”: “application/x-www-form-urlencoded”,
       “exclude”: [“foo”]
   },
     “header”: {
-# detect sqli on “bar”, “Referrer”, and “User-Agent”
+      # detect sqli on “bar”, “Referrer”, and “User-Agent”
       “include”: [“bar”]
     }
 }
