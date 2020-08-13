@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "wasm/utility/http_parser.h"
+#include "utility/http_parser.h"
 
 using ::testing::Eq;
 using ::testing::UnorderedElementsAreArray;

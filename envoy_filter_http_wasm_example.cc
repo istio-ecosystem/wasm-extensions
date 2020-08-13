@@ -5,9 +5,9 @@
 #include <unordered_set>
 
 #include "proxy_wasm_intrinsics.h"
-#include "wasm/utility/config.h"
-#include "wasm/utility/http_parser.h"
-#include "wasm/utility/sqli.h"
+#include "utility/config.h"
+#include "utility/http_parser.h"
+#include "utility/sqli.h"
 
 void onSQLi(std::string part) {
   LOG_ERROR("SQL injection detected");

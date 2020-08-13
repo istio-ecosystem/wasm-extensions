@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "wasm/utility/sqli.h"
+#include "utility/sqli.h"
 
 using ::testing::Eq;
 using ::testing::UnorderedElementsAreArray;

@@ -1,4 +1,4 @@
-#include "wasm/utility/common.h"
+#include "common.h"
 #include "nlohmann/json.hpp"
 
 using Json = nlohmann::json;
