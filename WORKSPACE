@@ -4,6 +4,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 ######################
 # Proxy-Wasm C++ SDK #
 ######################
+
+# updated version with istio proxy
 BUILD_ALL_CONTENT = """filegroup(name = "all", srcs = glob(["**"]), visibility = ["//visibility:public"])"""
 http_archive(
     name = "emscripten_toolchain",
@@ -23,6 +25,7 @@ http_archive(
 )
 
 
+# envoy wasm version
 http_archive(
     name = "emscripten_toolchain_old",
     build_file_content = BUILD_ALL_CONTENT,

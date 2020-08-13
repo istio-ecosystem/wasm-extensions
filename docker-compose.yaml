@@ -8,7 +8,7 @@ services:
     volumes:
       - ./envoy.yaml:/etc/envoy.yaml
       - ./envoy_wasm_example.wasm:/etc/envoy_wasm_example.wasm
-      - ./bazel-bin/wasm/envoy_filter_http_wasm_example.wasm:/etc/envoy_filter_http_wasm_example.wasm
+      - ./bazel-bin/WAF_wasm.wasm:/etc/WAF_wasm.wasm
       # Uncomment this line if you want to use your own Envoy with WASM enabled.
       #- /tmp/envoy-docker-build/envoy/source/exe/envoy:/usr/local/bin/envoy
     networks:

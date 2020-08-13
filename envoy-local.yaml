@@ -33,7 +33,7 @@ static_resources:
                   runtime: "envoy.wasm.runtime.v8"
                   code:
                     local:
-                      filename: "/usr/local/google/home/kagura/WAF-wasm/bazel-bin/envoy_filter_http_wasm_example.wasm"
+                      filename: "/usr/local/google/home/kagura/WAF-wasm/bazel-bin/WAF_wasm.wasm"
                   allow_precompiled: true
                 configuration:
                   "@type": "type.googleapis.com/google.protobuf.StringValue"

@@ -54,7 +54,7 @@ private:
 };
 static RegisterContextFactory register_ExampleContext(CONTEXT_FACTORY(ExampleContext),
                                                       ROOT_FACTORY(ExampleRootContext),
-                                                      "my_root_id");
+                                                      "root_WAF");
 
 bool ExampleRootContext::onStart(size_t) {
   LOG_TRACE("onStart");
