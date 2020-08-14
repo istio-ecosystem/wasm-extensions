@@ -1,6 +1,6 @@
 #include "common.h"
-#include "libinjection.h"
-#include "libinjection_sqli.h"
+#include "libinjection/libinjection.h"
+#include "libinjection/libinjection_sqli.h"
 
 /**
  * Detect SQL injection on input string
