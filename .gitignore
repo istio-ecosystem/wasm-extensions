@@ -1,3 +1,5 @@
 .bazelrc
 clang.bazelrc
 /bazel-*
+
+*.wasm
