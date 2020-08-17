@@ -1,23 +1,18 @@
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
-
-#include "utility/config.h"
-
-using ::testing::Eq;
-using ::testing::UnorderedElementsAreArray;
-using ::testing::IsEmpty;
+#include "test_common.h"
+#include "../utility/config_parser.h"
 
 // Check that invalid json formatting will be handled
-TEST(ConfigTest, InvalidFormattingConfig) {
+TEST InvalidFormat(void) {
   std::string log;
   Config config;
   bool result = parseConfig("invalid json format {}", &config, &log);
   ASSERT_EQ(result, false);
   ASSERT_EQ(log, "JSON parse error in configuration");
+  PASS();
 }
 
 // Check that empty config string corresponds to default setting
-TEST(ConfigTest, EmptyConfig) {
+TEST EmptyConfig(void) {
   std::string log;
   Config config;
   parseConfig("", &config, &log);
@@ -28,14 +23,17 @@ TEST(ConfigTest, EmptyConfig) {
   ASSERT_EQ(config.params.size(), 0);
 
   ASSERT_EQ(config.header_include, true);
-  ASSERT_THAT(config.headers, UnorderedElementsAreArray({"referer", "user-agent"}));
+  Keys expected = Keys({"referer", "user-agent"});
+  ASSERT_EQUAL_T(&config.headers, &expected, &Keys_info, NULL);
 
   ASSERT_EQ(config.cookie_include, false);
   ASSERT_EQ(config.cookies.size(), 0);
+
+  PASS();
 }
 
 // Check that query param inputs are parsed correctly
-TEST(ConfigTest, QueryParams) {
+TEST QueryParamsConfig(void) {
   std::string log;
   bool result;
 
@@ -76,7 +74,8 @@ TEST(ConfigTest, QueryParams) {
   result = parseConfig(param_default, &config_default, &log);
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_default.param_include, false);
-  ASSERT_THAT(config_default.params, IsEmpty());
+  Keys expected_default = Keys({});
+  ASSERT_EQUAL_T(&config_default.params, &expected_default, &Keys_info, NULL);
 
   // success: include is provided
   Config config_include;
@@ -91,7 +90,8 @@ TEST(ConfigTest, QueryParams) {
   result = parseConfig(param_include, &config_include, &log);
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_include.param_include, true);
-  ASSERT_THAT(config_include.params, UnorderedElementsAreArray({"foo", "bar"}));
+  Keys expected_include = Keys({"foo", "bar"});
+  ASSERT_EQUAL_T(&config_include.params, &expected_include, &Keys_info, NULL);
 
   // success: exclude is provided
   Config config_exclude;
@@ -106,7 +106,8 @@ TEST(ConfigTest, QueryParams) {
   result = parseConfig(param_exclude, &config_exclude, &log);
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_exclude.param_include, false);
-  ASSERT_THAT(config_exclude.params, UnorderedElementsAreArray({"foo", "bar"}));
+  Keys expected_exclude = Keys({"foo", "bar"});
+  ASSERT_EQUAL_T(&config_exclude.params, &expected_exclude, &Keys_info, NULL);
 
   // failure: both include and exclude are provided
   Config config_both;
@@ -122,9 +123,11 @@ TEST(ConfigTest, QueryParams) {
   result = parseConfig(param_both, &config_both, &log);
   ASSERT_EQ(result, false);
   ASSERT_EQ(log, "include and exclude cannot both be present");
+
+  PASS();
 }
 
-TEST(ConfigTest, Header) {
+TEST HeaderConfig(void) {
   // note that the config objects passed into the parser are initialized to
   // default value. In default, the header field will include "user-agent" and
   // "referer" according to ModSecurity rule 942100.
@@ -142,7 +145,8 @@ TEST(ConfigTest, Header) {
   result = parseConfig(param_default, &config_default, &log);
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_default.header_include, true);
-  ASSERT_THAT(config_default.headers, UnorderedElementsAreArray({"user-agent", "referer"}));
+  Keys expected_default = Keys({"user-agent", "referer"});
+  ASSERT_EQUAL_T(&config_default.headers, &expected_default, &Keys_info, NULL);
 
   // success: include is provided
   Config config_include;
@@ -156,7 +160,8 @@ TEST(ConfigTest, Header) {
   result = parseConfig(param_include, &config_include, &log);
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_include.header_include, true);
-  ASSERT_THAT(config_include.headers, UnorderedElementsAreArray({"foo", "referer", "user-agent"}));
+  Keys expected_include = Keys({"foo", "referer", "user-agent"});
+  ASSERT_EQUAL_T(&config_include.headers, &expected_include, &Keys_info, NULL);
 
   // success: exclude is provided
   Config config_exclude;
@@ -168,10 +173,10 @@ TEST(ConfigTest, Header) {
   }
   )";
   result = parseConfig(param_exclude, &config_exclude, &log);
-  std::cerr << log;
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_exclude.param_include, false);
-  ASSERT_THAT(config_exclude.headers, UnorderedElementsAreArray({"foo", "bar", "user-agent"}));
+  Keys expected_exclude = Keys({"foo", "bar", "user-agent"});
+  ASSERT_EQUAL_T(&config_exclude.headers, &expected_exclude, &Keys_info, NULL);
 
   // failure: both include and exclude are provided
   Config config_both;
@@ -186,9 +191,11 @@ TEST(ConfigTest, Header) {
   result = parseConfig(param_both, &config_both, &log);
   ASSERT_EQ(result, false);
   ASSERT_EQ(log, "include and exclude cannot both be present");
+
+  PASS();
 }
 
-TEST(ConfigTest, Cookie) {
+TEST CookieConfig(void) {
   bool result;
   std::string log;
 
@@ -202,7 +209,8 @@ TEST(ConfigTest, Cookie) {
   result = parseConfig(param_default, &config_default, &log);
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_default.cookie_include, false);
-  ASSERT_THAT(config_default.cookies, IsEmpty());
+  Keys expected_default = Keys({});
+  ASSERT_EQUAL_T(&config_default.cookies, &expected_default, &Keys_info, NULL);
 
   // success: include is provided
   Config config_include;
@@ -216,7 +224,8 @@ TEST(ConfigTest, Cookie) {
   result = parseConfig(param_include, &config_include, &log);
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_include.cookie_include, true);
-  ASSERT_THAT(config_include.cookies, UnorderedElementsAreArray({"foo", "bar"}));
+  Keys expected_include = Keys({"foo", "bar"});
+  ASSERT_EQUAL_T(&config_include.cookies, &expected_include, &Keys_info, NULL);
 
   // success: exclude is provided
   Config config_exclude;
@@ -230,7 +239,8 @@ TEST(ConfigTest, Cookie) {
   result = parseConfig(param_exclude, &config_exclude, &log);
   ASSERT_EQ(result, true);
   ASSERT_EQ(config_exclude.cookie_include, false);
-  ASSERT_THAT(config_exclude.cookies, UnorderedElementsAreArray({"foo", "bar"}));
+  Keys expected_exclude = Keys({"foo", "bar"});
+  ASSERT_EQUAL_T(&config_exclude.cookies, &expected_exclude, &Keys_info, NULL);
 
   // failure: both include and exclude are provided
   Config config_both;
@@ -245,4 +255,22 @@ TEST(ConfigTest, Cookie) {
   result = parseConfig(param_both, &config_both, &log);
   ASSERT_EQ(result, false);
   ASSERT_EQ(log, "include and exclude cannot both be present");
+
+  PASS();
+}
+
+SUITE(configTests) {
+  RUN_TEST(InvalidFormat);
+  RUN_TEST(EmptyConfig);
+  RUN_TEST(QueryParamsConfig);
+  RUN_TEST(HeaderConfig);
+  RUN_TEST(CookieConfig);
+}
+
+GREATEST_MAIN_DEFS();
+
+int main(int argc, char** argv){
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(configTests);
+  GREATEST_MAIN_END();
 }

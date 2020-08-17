@@ -2,12 +2,13 @@ PROXY_WASM_CPP_SDK=/sdk
 
 all: WAF_wasm.wasm
 
+# The following are copied from ${PROXY_WASM_CPP_SDK}/Makefile.base_lite
+# The UTILITY_LIB and UTILITY_HEADER are newly added
 ifdef NO_CONTEXT
   CPP_CONTEXT_LIB =
 else
   CPP_CONTEXT_LIB = ${PROXY_WASM_CPP_SDK}/proxy_wasm_intrinsics.cc
 endif
-
 
 UTILITY_LIB = utility/*.cc utility/libinjection/*.c
 UTILITY_HEADER = utility/*.h utility/libinjection/*.h utility/nlohmann/json.hpp

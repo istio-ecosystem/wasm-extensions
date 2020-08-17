@@ -1,26 +1,11 @@
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
+#include "test_common.h"
+#include "../utility/http_parser.h"
 
-#include "utility/http_parser.h"
 
-using ::testing::Eq;
-using ::testing::UnorderedElementsAreArray;
-using ::testing::IsEmpty;
-
-MATCHER_P(ParamsEq, expected_params, "params does not match") {
-  if (expected_params.size() != arg.size()) {
-    return false;
-  }
-  for (auto param : expected_params) {
-    auto match = arg.find(param.first);
-    if (match == arg.end() || match->second != param.second) {
-      return false;
-    }
-  }
-  return true;
-}
-
-TEST(HttpParserTest, PercentDecodingTest) {
+/*********
+ * TESTS *
+ *********/
+TEST PercentDecodingTest(void) {
   ASSERT_EQ(percentDecode(""), "");
   ASSERT_EQ(percentDecode("not encoded"), "not encoded");
   ASSERT_EQ(percentDecode("_not-encoded_"), "_not-encoded_");
@@ -41,54 +26,75 @@ TEST(HttpParserTest, PercentDecodingTest) {
   ASSERT_EQ(percentDecode("too%20large%"), "too large%");
   ASSERT_EQ(percentDecode("too%25large"), "too%large");
   ASSERT_EQ(percentDecode("too%25!large/"), "too%!large/");
+  PASS();
 }
 
-TEST(HttpParserTest, ParseCookieTest) {
-  ASSERT_THAT(parseCookie("abc=def; token=abc123; Expires=Wed, 09 Jun 2021 10:18:14 GMT"),
-              ParamsEq(QueryParams({
-                {"abc", "def"},
-                {"token", "abc123"},
-                {"Expires", "Wed, 09 Jun 2021 10:18:14 GMT"}
-              })));
+TEST ParseCookieTest(void) {
+  CHECK_CALL(matchParams(parseCookie("abc=def; token=abc123; Expires=Wed, 09 Jun 2021 10:18:14 GMT"),
+                         QueryParams({
+                           {"abc", "def"},
+                           {"token", "abc123"},
+                           {"Expires", "Wed, 09 Jun 2021 10:18:14 GMT"}
+                         })));
 
   // cookies with bad formatting
-  ASSERT_EQ(parseCookie("token1=abc123; = ").find("token1")->second, "abc123");
-  ASSERT_EQ(parseCookie("token2=abc123;   ").find("token2")->second, "abc123");
-  ASSERT_EQ(parseCookie("; token3=abc123;").find("token3")->second, "abc123");
-  ASSERT_EQ(parseCookie("=; token4=\"abc123\"").find("token4")->second, "abc123");
+  CHECK_CALL(matchValue(parseCookie("token1=abc123; = "), "token1", "abc123"));
+  CHECK_CALL(matchValue(parseCookie("token2=abc123;   "), "token2", "abc123"));
+  CHECK_CALL(matchValue(parseCookie("; token3=abc123;"), "token3", "abc123"));
+  CHECK_CALL(matchValue(parseCookie("=; token4=\"abc123\""), "token4", "abc123"));
 
   // cookies with quotes
-  ASSERT_THAT(parseCookie("dquote=\"; quoteddquote=\"\"\"; leadingdquote=\"foobar;"),
-              ParamsEq(QueryParams({
-                {"dquote", "\""},
-                {"quoteddquote", "\""},
-                {"leadingdquote", "\"foobar"}})));
+  CHECK_CALL(matchParams(
+      QueryParams({
+        {"dquote", "\""},
+        {"quoteddquote", "\""},
+        {"leadingdquote", "\"foobar"}
+      }),
+      parseCookie("dquote=\"; quoteddquote=\"\"\"; leadingdquote=\"foobar;")
+  ));
+  PASS();
 }
 
-TEST(HttpParserTest, ParseBodyTest) {
-  ASSERT_THAT(parseBody(""), ParamsEq(QueryParams()));
-  ASSERT_THAT(parseBody("hello"), ParamsEq(QueryParams({{"hello", ""}})));
-  ASSERT_THAT(parseBody("hello="),ParamsEq(QueryParams({{"hello", ""}})));
-  ASSERT_THAT(parseBody("hello=&"),ParamsEq(QueryParams({{"hello", ""}})));
-  ASSERT_THAT(parseBody("hello=world"),
-              ParamsEq(QueryParams({{"hello", "world"}})));
-  ASSERT_THAT(parseBody("hello=&hello2=world2"),
-              ParamsEq(QueryParams({{"hello", ""}, {"hello2", "world2"}})));
-  ASSERT_THAT(parseBody("name=admin&level=trace"),
-              ParamsEq(QueryParams({{"name", "admin"}, {"level", "trace"}})));
+TEST ParseBodyTest(void) {
+  CHECK_CALL(matchParams(parseBody(""), QueryParams()));
+  CHECK_CALL(matchParams(parseBody("hello"), QueryParams({{"hello", ""}})));
+  CHECK_CALL(matchParams(parseBody("hello="), QueryParams({{"hello", ""}})));
+  CHECK_CALL(matchParams(parseBody("hello=&"), QueryParams({{"hello", ""}})));
+  CHECK_CALL(matchParams(parseBody("hello=world"),
+                         QueryParams({{"hello", "world"}})));
+  CHECK_CALL(matchParams(parseBody("hello=&hello2=world2"),
+                         QueryParams({{"hello", ""}, {"hello2", "world2"}})));
+  CHECK_CALL(matchParams(parseBody("name=admin&level=trace"),
+                         QueryParams({{"name", "admin"}, {"level", "trace"}})));
+  PASS();
 }
 
-// Check that path queries are parsed properly
-TEST(HttpParserTest, ParsePathTest) {
-  ASSERT_THAT(parsePath("/hello"), ParamsEq(QueryParams()));
-  ASSERT_THAT(parsePath("/hello?"), ParamsEq(QueryParams()));
-  ASSERT_THAT(parsePath("/hello?hello"), ParamsEq(QueryParams({{"hello", ""}})));
-  ASSERT_THAT(parsePath("/hello?hello="),ParamsEq(QueryParams({{"hello", ""}})));
-  ASSERT_THAT(parsePath("/hello?hello=&"),ParamsEq(QueryParams({{"hello", ""}})));
-  ASSERT_THAT(parsePath("/hello?hello=world"),
-              ParamsEq(QueryParams({{"hello", "world"}})));
-  ASSERT_THAT(parsePath("/hello?hello=&hello2=world2"),
-              ParamsEq(QueryParams({{"hello", ""}, {"hello2", "world2"}})));
-  ASSERT_THAT(parsePath("/logging?name=admin&level=trace"),
-              ParamsEq(QueryParams({{"name", "admin"}, {"level", "trace"}})));
+TEST ParsePathTest(void) {
+  CHECK_CALL(matchParams(parsePath("/hello"), QueryParams()));
+  CHECK_CALL(matchParams(parsePath("/hello?"), QueryParams()));
+  CHECK_CALL(matchParams(parsePath("/hello?hello"), QueryParams({{"hello", ""}})));
+  CHECK_CALL(matchParams(parsePath("/hello?hello="),QueryParams({{"hello", ""}})));
+  CHECK_CALL(matchParams(parsePath("/hello?hello=&"),QueryParams({{"hello", ""}})));
+  CHECK_CALL(matchParams(parsePath("/hello?hello=world"),
+                         QueryParams({{"hello", "world"}})));
+  CHECK_CALL(matchParams(parsePath("/hello?hello=&hello2=world2"),
+                         QueryParams({{"hello", ""}, {"hello2", "world2"}})));
+  CHECK_CALL(matchParams(parsePath("/logging?name=admin&level=trace"),
+                         QueryParams({{"name", "admin"}, {"level", "trace"}})));
+  PASS();
+}
+
+SUITE(HttpParserTest) {
+  RUN_TEST(PercentDecodingTest);
+  RUN_TEST(ParseCookieTest);
+  RUN_TEST(ParseBodyTest);
+  RUN_TEST(ParsePathTest);
+}
+
+GREATEST_MAIN_DEFS();
+
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(HttpParserTest);
+  GREATEST_MAIN_END();
 }

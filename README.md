@@ -44,6 +44,16 @@ curl -d "val=-1%27+and+1%3D1%0D%0A" -v localhost:8000
 You will receive a response with HTTP code 403 Forbidden. The body of the http request above has the parameter `val` with the value `-1' and 1=1` in URL
 encoding.
 
+## Unit Tests
+
+Unit tests for individual utility functions in the WAF WASM extension are
+available in `test` directory. To run them, execute from the root of the
+repository:
+```
+source ./build_test.sh
+```
+
+
 ## Configuration
 The rules for SQL injection detection can be configured from YAML files. An example of configuration can be found in `envoy-config.yaml`. Configuration are passsed through the field `config.config.configuration.value` in the yaml file in JSON syntax as below:
 
