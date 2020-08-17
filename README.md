@@ -5,10 +5,11 @@ This repository is forked from [`envoyproxy/envoy-wasm`](https://github.com/envo
 ## Build
 
 We will build the WASM module with `proxy-wasm-cpp-sdk` on docker.
-We first need to build the image of the SDK from its repository:
+We first need to build the image of the SDK from its repository on the `envoy-release/v1.15` branch:
 ```
 git clone git@github.com:proxy-wasm/proxy-wasm-cpp-sdk.git
 cd proxy-wasm-cpp-sdk
+git checkout envoy-release/v1.15 
 docker build -t wasmsdk:v2 -f Dockerfile-sdk .
 ```
 Then from the root of this repository, build the WASM module with:
