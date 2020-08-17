@@ -27,8 +27,8 @@ docker pull istio/proxyv2:1.7.0-beta.2
 Then run the proxy with WASM configured:
 ```
 docker run \
--v ~/WAF-wasm/envoy.yaml:/etc/envoy.yaml \
--v ~/WAF-wasm/WAF_wasm.wasm:/etc/WAF_wasm.wasm \
+-v ${PWD}/envoy.yaml:/etc/envoy.yaml \
+-v ${PWD}/WAF_wasm.wasm:/etc/WAF_wasm.wasm \
 -p 8000:8000 \
 --entrypoint /usr/local/bin/envoy \
 istio/proxyv2:1.7.0-beta.2 -l trace --concurrency 1 -c /etc/envoy.yaml
