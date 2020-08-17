@@ -13,7 +13,7 @@ docker build -t wasmsdk:v2 -f Dockerfile-sdk .
 ```
 Then from the root of this repository, build the WASM module with:
 ```
-docker run -v $PWD:/work -w /work wasmskd:v2 /build_wasm.sh
+docker run -v $PWD:/work -w /work wasmsdk:v2 /build_wasm.sh
 ```
 After the compilation completes, you should find a `WAF_wasm.wasm` file in the repository.
 

@@ -5,7 +5,7 @@
 #include <unordered_set>
 
 #include "proxy_wasm_intrinsics.h"
-#include "utility/config.h"
+#include "utility/config_parser.h"
 #include "utility/http_parser.h"
 #include "utility/sqli.h"
 
