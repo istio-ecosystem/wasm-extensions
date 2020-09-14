@@ -1,0 +1,6 @@
+.bazelrc
+clang.bazelrc
+/bazel-*
+
+*/*.o
+*.wasm
