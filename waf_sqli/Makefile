@@ -1,6 +1,6 @@
 PROXY_WASM_CPP_SDK=/sdk
 
-all: WAF_wasm.wasm
+all: waf_sqli.wasm
 
 # The following are copied from ${PROXY_WASM_CPP_SDK}/Makefile.base_lite
 # The UTILITY_LIB and UTILITY_HEADER are newly added

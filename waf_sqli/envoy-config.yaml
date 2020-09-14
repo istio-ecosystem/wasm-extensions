@@ -33,7 +33,7 @@ static_resources:
                   runtime: "envoy.wasm.runtime.v8"
                   code:
                     local:
-                      filename: "/etc/WAF_wasm.wasm"
+                      filename: "/etc/waf_sqli.wasm"
                   allow_precompiled: true
                 configuration:
                   "@type": "type.googleapis.com/google.protobuf.StringValue"

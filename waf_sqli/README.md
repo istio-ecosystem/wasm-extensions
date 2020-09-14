@@ -16,7 +16,7 @@ Then from the root of this repository, build the WASM module with:
 ```
 docker run -v $PWD:/work -w /work wasmsdk:v2 /build_wasm.sh
 ```
-After the compilation completes, you should find a `WAF_wasm.wasm` file in the repository.
+After the compilation completes, you should find a `waf_sqli.wasm` file in the repository.
 
 ## Deploy
 We can mount the WASM module onto the docker image of Istio proxy to run it.
@@ -28,7 +28,7 @@ Then run the proxy with WASM configured:
 ```
 docker run \
 -v ${PWD}/envoy.yaml:/etc/envoy.yaml \
--v ${PWD}/WAF_wasm.wasm:/etc/WAF_wasm.wasm \
+-v ${PWD}/waf_sqli.wasm:/etc/waf_sqli.wasm \
 -p 8000:8000 \
 --entrypoint /usr/local/bin/envoy \
 istio/proxyv2:1.7.0-beta.2 -l trace --concurrency 1 -c /etc/envoy.yaml
