@@ -37,9 +37,3 @@ jobs:
         sudo apt-get install clang-format-9
         find . -name "*.h" -o -name "*.cc" -o -name "*.proto" | grep -v ".pb." | xargs -n1 clang-format-9 -i
         git diff --exit-code
-
-    - name: Format (buildifier)
-      run: |
-        go get -u github.com/bazelbuild/buildtools/buildifier
-        export PATH=$PATH:$(go env GOPATH)/bin
-        find . -name "BUILD" | xargs -n1 buildifier -mode=check
