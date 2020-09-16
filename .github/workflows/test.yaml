@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Bazel
+name: Test
 
 on:
 
@@ -26,7 +26,7 @@ on:
 
 jobs:
 
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,8 +44,12 @@ jobs:
         mkdir -p "${GITHUB_WORKSPACE}/bin/"
         mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
         chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
+    
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '^1.15.2'
 
-    - name: Build File Format (buildifier)
+    - name: Build file format (buildifier)
       run: |
         go get -u github.com/bazelbuild/buildtools/buildifier
         export PATH=$PATH:$(go env GOPATH)/bin
@@ -53,9 +57,18 @@ jobs:
 
     - name: Build
       run: |
-        "${GITHUB_WORKSPACE}/bin/bazel" build //...
+        for target in $(bazel query ...); do
+          if [[ "{$target}" == *":_wasm_"* ]]; then
+            # skip wasm transition target
+            continue
+          fi
+          "${GITHUB_WORKSPACE}/bin/bazel" build "${target}"
+        done
 
-    # TODO(bianpengyuan): Add test flow when there is tests in this repo
-    # - name: Test
-    #   run: |
-    #     "${GITHUB_WORKSPACE}/bin/bazel" test //...
+    - name: Unit Test
+      run: |
+        "${GITHUB_WORKSPACE}/bin/bazel" test //...
+
+    - name: Integration Test
+      run: |
+        go test ./...

@@ -1,0 +1,27 @@
+- name: istio.basic_auth
+  typed_config:
+    "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+    type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+    value:
+      config:
+        vm_config:
+          runtime: "envoy.wasm.runtime.v8"
+          code:
+            local: { filename: "{{ .Vars.BasicAuthWasmFile }}" }
+        configuration:
+          "@type": "type.googleapis.com/google.protobuf.StringValue"
+          value: |
+            {
+              "basic_auth_rules": [
+                { 
+                  "prefix": "/api",
+                  "request_methods":[ "GET", "POST" ],
+                  "credentials":[ "ok:test", "admin:admin", "admin2:admin2" ] 
+                },
+                { 
+                  "exact": "/api",
+                  "request_methods":[ "GET", "POST" ],
+                  "credentials":[ "admin:admin", "admin2:admin2", "ok:test" ] 
+                }
+              ]
+            }
