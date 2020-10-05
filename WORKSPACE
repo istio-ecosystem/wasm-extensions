@@ -3,6 +3,7 @@ workspace(name = "istio_ecosystem_wasm_extensions")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
+# reference the same commit as istio release-1.7
 http_archive(
     name = "proxy_wasm_cpp_sdk",
     sha256 = "06f0f386dc8111082062f01e74e0c297e4a83857585519adb8727a3e7170f3b7",
@@ -10,6 +11,7 @@ http_archive(
     url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/558d45a2f496e3039e50584cf8304ae535ca73de.tar.gz",
 )
 
+# reference the same commit as istio release-1.7
 http_archive(
     name = "proxy_wasm_cpp_host",
     sha256 = "5103e2a42374d8b241f1b28dd84652ea137ed983208e086388ff9621d08fbaaf",
@@ -17,6 +19,7 @@ http_archive(
     url = "https://github.com/proxy-wasm/proxy-wasm-cpp-host/archive/51e2013584cc87e0a797444b32bca0522252178d.tar.gz",
 )
 
+# point to the same emscripten version as istio release-1.7
 http_archive(
     name = "emscripten_toolchain",
     build_file = "//bazel/wasm:emscripten-toolchain.BUILD",
