@@ -1,3 +1,5 @@
+# Forked from https://github.com/istio/envoy/blob/release-1.7/bazel/wasm/wasm.bzl
+
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 def _wasm_transition_impl(settings, attr):

@@ -1,5 +1,3 @@
-// Copyright 2020 Istio Authors
-//
 package basicauth
 
 import (
