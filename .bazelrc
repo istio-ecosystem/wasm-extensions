@@ -1,14 +1,13 @@
-# https://github.com/bazelbuild/bazel/issues/9451
-# ideally we want this, but it doesn't work...
-# build --cxxopt=-fno-canonical-system-headers
-# as a work around we use `sed` to "fix" the *.d files.
+build --cxxopt=-std=c++17
 
-build --crosstool_top=//toolchain:emscripten
+build:clang --action_env=BAZEL_COMPILER=clang
+build:clang --linkopt=-fuse-ld=lld
 
-# Use --cpu as a differentiator.
-build --cpu=wasm32
-
-# Use the default Bazel C++ toolchain to build the tools used during the
-# build.
-
-build --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+# Clang with libc++
+build:libc++ --config=clang
+build:libc++ --action_env=CXXFLAGS=-stdlib=libc++
+build:libc++ --action_env=LDFLAGS=-stdlib=libc++
+build:libc++ --action_env=BAZEL_CXXOPTS=-stdlib=libc++
+build:libc++ --action_env=BAZEL_LINKLIBS=-l%:libc++.a:-l%:libc++abi.a
+build:libc++ --action_env=BAZEL_LINKOPTS=-lm:-pthread
+build:libc++ --define force_libcpp=enabled
