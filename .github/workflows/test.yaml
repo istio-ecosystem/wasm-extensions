@@ -53,7 +53,7 @@ jobs:
 
     - name: Unit Test
       run: |
-        "${GITHUB_WORKSPACE}/bin/bazel" test //...
+        "${GITHUB_WORKSPACE}/bin/bazel" test --test_output=errors //...
 
     - name: Integration Test
       run: |

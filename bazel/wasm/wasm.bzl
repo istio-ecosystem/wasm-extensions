@@ -1,4 +1,5 @@
 # Forked from https://github.com/istio/envoy/blob/release-1.7/bazel/wasm/wasm.bzl
+# TODO(bianpengyuna): use upstream envoy wasm_cc_binary rule.
 
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 

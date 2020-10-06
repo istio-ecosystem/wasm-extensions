@@ -4,6 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file"
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # reference the same commit as istio release-1.7
+# TODO(bianpengyuan): create a dep import rule in upstream istio/proxy and envoy to avoid duplication.
 http_archive(
     name = "proxy_wasm_cpp_sdk",
     sha256 = "06f0f386dc8111082062f01e74e0c297e4a83857585519adb8727a3e7170f3b7",
