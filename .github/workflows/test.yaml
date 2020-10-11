@@ -43,6 +43,8 @@ jobs:
 
     - name: Build
       run: |
+        set -eux
+
         for target in $(bazel query ...); do
           if [[ "{$target}" == *":_wasm_"* ]]; then
             # skip wasm transition target
