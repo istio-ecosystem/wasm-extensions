@@ -4,5 +4,5 @@ go 1.15
 
 require (
 	google.golang.org/grpc v1.32.0 // indirect
-	istio.io/proxy v0.0.0-20201003003728-4c865e48f2b7
+	istio.io/proxy v0.0.0-20201106215735-663bff11d492
 )

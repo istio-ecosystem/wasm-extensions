@@ -167,4 +167,6 @@ honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWh
 honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 istio.io/proxy v0.0.0-20201003003728-4c865e48f2b7 h1:SZeRnSx6HlwQoQKuytf3GE7iOlRWkwlXRZogHnx+5yI=
 istio.io/proxy v0.0.0-20201003003728-4c865e48f2b7/go.mod h1:Kj9cvDFJFsxmkvpNcIFuOS6xXBIiks3lsijSGGS4w4s=
+istio.io/proxy v0.0.0-20201106215735-663bff11d492 h1:JQv/Y8SVqMKzuR+D0dWviBRk+oFrMcrhzlmni3B2mAw=
+istio.io/proxy v0.0.0-20201106215735-663bff11d492/go.mod h1:TDOthd/cdMowkkf9yppY7fT+bCaFjLhCzM9WNH1Iq3s=
 istio.io/proxy/test/envoye2e/stackdriver_plugin/edges v0.0.0-20200916170758-74d763048fa1/go.mod h1:DJ8fOsm6uGcamIj5fnZPcX596Zk3gAGk8FUB4q6XZ9U=
