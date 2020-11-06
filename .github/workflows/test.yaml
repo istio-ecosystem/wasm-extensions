@@ -58,6 +58,6 @@ jobs:
       run: |
         set -eux
 
-        BRANCH_NAME=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+        BRANCH_NAME=$(echo "${GITHUB_BASE_REF}" | cut -d "/" -f3)
         export ISTIO_TEST_VERSION=${BRANCH_NAME#"release-"}
         go test ./...
