@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: example-cluster
+spec:
+  configPatches:
+  - applyTo: CLUSTER
+    match:
+      context: SIDECAR_INBOUND
+    patch:
+      operation: ADD
+      value: # cluster specification
+        name: google-storage
+        dns_lookup_family: V4_ONLY
+        type: STRICT_DNS
+        connect_timeout: 5s
+        transport_socket:
+          name: envoy.transport_sockets.tls
+        load_assignment:
+          cluster_name: storage.googleapis.com
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: storage.googleapis.com
+                    port_value: 443

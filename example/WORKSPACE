@@ -1,0 +1,19 @@
+workspace(name = "example_extension")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Pulls proxy wasm cpp SDK with a specific SHA
+http_archive(
+    name = "proxy_wasm_cpp_sdk",
+    sha256 = "5909993d801690ff29cc2354a36d4939d8d2b8db0cf4f331057b079b49e4863f",
+    strip_prefix = "proxy-wasm-cpp-sdk-8564f6660d0fdadc55fc55a4b894bb1abd283c6c",
+    url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/8564f6660d0fdadc55fc55a4b894bb1abd283c6c.tar.gz",
+)
+
+load("@proxy_wasm_cpp_sdk//bazel/dep:deps.bzl", "wasm_dependencies")
+
+wasm_dependencies()
+
+load("@proxy_wasm_cpp_sdk//bazel/dep:deps_extra.bzl", "wasm_dependencies_extra")
+
+wasm_dependencies_extra()
