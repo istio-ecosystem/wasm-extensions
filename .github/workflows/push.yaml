@@ -5,6 +5,7 @@ on:
   push:
     branches:
     - master
+    - release-[0-9]+.[0-9]+
 
 jobs:
 
@@ -31,7 +32,8 @@ jobs:
         run: |
           set -eux
 
-          SHA=$(git rev-parse HEAD)
+          BRANCH_NAME=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+          VERSION=${BRANCH_NAME#"release-"}
           for target in $(bazel query ...); do
             if [[ "{$target}" == *":_wasm_"* ]]; then
               # skip wasm transition target
@@ -47,7 +49,12 @@ jobs:
             tmp=${WASM_PATH%%.wasm}
             EXTENSION_NAME=$(basename ${tmp})
             mkdir -p wasm-extensions/${EXTENSION_NAME//_/-}
-            mv bazel-bin/${WASM_PATH} wasm-extensions/${EXTENSION_NAME//_/-}/${SHA}.wasm
+            cp bazel-bin/${WASM_PATH} wasm-extensions/${EXTENSION_NAME//_/-}/${GITHUB_SHA}.wasm
+
+            # also push binary with more readable name, so that it could be easily used in configuration and documentation.
+            # for example, the following command is going to push 'basic_auth/<SHA>.wasm' to 'basic_auth/1.7-2020-11-18-08-09-10' and 'basic_auth/1.7-latest'.
+            cp wasm-extensions/${EXTENSION_NAME//_/-}/${GITHUB_SHA}.wasm wasm-extensions/${EXTENSION_NAME//_/-}/${VERSION}-$(date +"%Y-%m-%d-%H-%M-%S").wasm
+            cp wasm-extensions/${EXTENSION_NAME//_/-}/${GITHUB_SHA}.wasm wasm-extensions/${EXTENSION_NAME//_/-}/${VERSION}-latest.wasm 
 
             # TODO: add precompiled module
           done
