@@ -88,7 +88,7 @@ fn parsePairs(pairs: []const u8, map: anytype) Result {
         offset += keys[i] + 1;
         var value = pairs[offset .. offset + values[i]];
         offset += values[i] + 1;
-        map.put(key, value) catch |_| return .parse_failure;
+        map.put(key, value) catch return .parse_failure;
         i += 1;
     }
     return .ok;
@@ -98,7 +98,7 @@ fn parsePairs(pairs: []const u8, map: anytype) Result {
 extern "env" fn proxy_log(LogLevel, [*]const u8, usize) Result;
 fn log(comptime l: LogLevel, comptime fmt: []const u8, args: anytype) void {
     var log_buf: [1024]u8 = undefined;
-    const msg = std.fmt.bufPrint(log_buf[0..], fmt, args) catch |_| {
+    const msg = std.fmt.bufPrint(log_buf[0..], fmt, args) catch {
         const err: []const u8 = "buffer too small";
         _ = proxy_log(.trace, err.ptr, err.len);
         return;
