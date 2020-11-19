@@ -15,6 +15,8 @@ func init() {
 			"TestBasicAuth/NoPathMatch",
 			"TestBasicAuth/NoMethodMatch",
 			"TestBasicAuth/NoConfigurationCredentialsProvided",
+			"TestLocalRateLimitFilter/MatchConfig",
+			"TestLocalRateLimitFilter/DefaultConfig",
 		},
 	}
 }
