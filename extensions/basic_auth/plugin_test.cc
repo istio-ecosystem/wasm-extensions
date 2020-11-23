@@ -51,19 +51,19 @@ class BasicAuthTest : public ::testing::Test {
 
     ON_CALL(*mock_context_, getHeaderMapValue(WasmHeaderMapType::RequestHeaders,
                                               testing::_, testing::_))
-        .WillByDefault(
-            [&](WasmHeaderMapType, std::string_view header, std::string_view* result) {
-              if (header == ":path") {
-                *result = path_;
-              }
-              if (header == ":method") {
-                *result = method_;
-              }
-              if (header == "authorization") {
-                *result = authorization_header_;
-              }
-              return WasmResult::Ok;
-            });
+        .WillByDefault([&](WasmHeaderMapType, std::string_view header,
+                           std::string_view* result) {
+          if (header == ":path") {
+            *result = path_;
+          }
+          if (header == ":method") {
+            *result = method_;
+          }
+          if (header == "authorization") {
+            *result = authorization_header_;
+          }
+          return WasmResult::Ok;
+        });
 
     // Initialize Wasm sandbox context
     root_context_ = std::make_unique<PluginRootContext>(0, "");
