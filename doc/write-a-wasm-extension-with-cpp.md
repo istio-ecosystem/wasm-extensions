@@ -70,7 +70,7 @@ After adding the method, build the extension again with the bazel command mentio
 
 ## Step 4: Write integration test
 
-To enable quick iteration and deploy your extension with confidence, it is **highly** recommended to write integration tests with your extension and the same Envoy binary Istio proxy runs. To achieve this, the same Golang integration test framework for Telemetry v2 filter could be used, which at high level does the follows:
+To enable quick iteration and deploy your extension with confidence, it is **highly** recommended to write integration tests with your extension and the same Envoy binary Istio proxy runs. To achieve this, the same [Golang integration test framework](https://godoc.org/github.com/istio/proxy/test/envoye2e) for Telemetry v2 filter could be used, which at high level does the follows:
 * Downloads Envoy binary, which is built by Istio proxy postsubmit and used in istio proxy docker container.
 * Spins up Envoy processes locally with customizable bootstrap template.
 * Spins up a xDS server locally, which serves customizable xDS resources. In the test logic, the xDS resource will reference the local WebAssembly extension files built at former steps.
@@ -86,7 +86,7 @@ An unit test example could be found under the [basic auth plugin](../extensions/
 
 ## Step 6: Push and deploy the extension
 
-After the extension has been verified and tested, it is time to deploy the extension with Istio! Assume you have already deployed a [httpbin example app](https://github.com/istio/istio/tree/master/samples/httpbin) in your cluster, and the extension has been pushed to a blob serving service, applying the following EnvoyFilter to inject the example extension:
+After the extension has been verified and tested, it is time to deploy the extension with Istio! Assume you have already deployed a [httpbin example app](https://github.com/istio/istio/tree/master/samples/httpbin) in your cluster, and the extension has been pushed to a blob serving service, you can use EnvoyFilter to inject the example extension:
 
 Apply the following [EnvoyFilter](../example/config/storage-cluster.yaml) to register the blob service cluster for Extension downloading. Here we use Google Cloud Storage as an example:
 ```yaml
