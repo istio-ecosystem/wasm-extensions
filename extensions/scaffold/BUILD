@@ -1,4 +1,4 @@
-load("//bazel/wasm:wasm.bzl", "wasm_cc_binary")
+load("@proxy_wasm_cpp_sdk//bazel/wasm:wasm.bzl", "wasm_cc_binary")
 
 wasm_cc_binary(
     name = "scaffold.wasm",

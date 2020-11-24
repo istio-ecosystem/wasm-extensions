@@ -20,14 +20,14 @@ class MockContext : public proxy_wasm::ContextBase {
   MockContext(WasmBase* wasm) : ContextBase(wasm) {}
 
   MOCK_METHOD(BufferInterface*, getBuffer, (WasmBufferType));
-  MOCK_METHOD(WasmResult, log, (uint32_t, string_view));
+  MOCK_METHOD(WasmResult, log, (uint32_t, std::string_view));
   MOCK_METHOD(WasmResult, getHeaderMapValue,
-              (WasmHeaderMapType /* type */, string_view /* key */,
-               string_view* /*result */));
+              (WasmHeaderMapType /* type */, std::string_view /* key */,
+               std::string_view* /*result */));
   MOCK_METHOD(WasmResult, sendLocalResponse,
-              (uint32_t /* response_code */, string_view /* body */,
+              (uint32_t /* response_code */, std::string_view /* body */,
                Pairs /* additional_headers */, uint32_t /* grpc_status */,
-               string_view /* details */));
+               std::string_view /* details */));
 };
 
 class BasicAuthTest : public ::testing::Test {
@@ -51,19 +51,19 @@ class BasicAuthTest : public ::testing::Test {
 
     ON_CALL(*mock_context_, getHeaderMapValue(WasmHeaderMapType::RequestHeaders,
                                               testing::_, testing::_))
-        .WillByDefault(
-            [&](WasmHeaderMapType, string_view header, string_view* result) {
-              if (header == ":path") {
-                *result = path_;
-              }
-              if (header == ":method") {
-                *result = method_;
-              }
-              if (header == "authorization") {
-                *result = authorization_header_;
-              }
-              return WasmResult::Ok;
-            });
+        .WillByDefault([&](WasmHeaderMapType, std::string_view header,
+                           std::string_view* result) {
+          if (header == ":path") {
+            *result = path_;
+          }
+          if (header == ":method") {
+            *result = method_;
+          }
+          if (header == "authorization") {
+            *result = authorization_header_;
+          }
+          return WasmResult::Ok;
+        });
 
     // Initialize Wasm sandbox context
     root_context_ = std::make_unique<PluginRootContext>(0, "");
