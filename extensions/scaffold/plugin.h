@@ -13,7 +13,7 @@ namespace scaffold {
 #endif
 
 // PluginRootContext is the root context for all streams processed by the
-// thread. It has the same lifetime as the worker thread and acts as target for
+// thread. It has the same lifetime as the VM and acts as target for
 // interactions that outlives individual stream, e.g. timer, async calls.
 class PluginRootContext : public RootContext {
  public:
