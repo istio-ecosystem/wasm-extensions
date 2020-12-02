@@ -13,10 +13,13 @@ This repository contains several canonical Wasm extensions, which intend to demo
 
 # Guides
 
+## C++
 * [Development set up](doc/development-setup.md)
-* [How to write, test, and deploy, and maintain a Wasm extension with C++](./doc/write-a-wasm-extension-with-cpp.md)
-* [Write integration test for your extension](./doc/write-integration-test.md)
-* [Write unit test for your extension](./doc/write-unit-test.md)
+* [Write, test, and deploy, and maintain a Wasm extension](./doc/write-a-wasm-extension-with-cpp.md)
+
+## Test
+* [Write integration test for Wasm extension](./doc/write-integration-test.md)
+* [Write unit test for Wasm extension](./doc/write-unit-test.md)
 
 [test-badge]: https://github.com/istio-ecosystem/wasm-extensions/workflows/Test/badge.svg
 [test-link]: https://github.com/istio-ecosystem/wasm-extensions/actions?query=workflow%3ATest
