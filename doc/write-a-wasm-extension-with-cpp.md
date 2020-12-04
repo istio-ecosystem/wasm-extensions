@@ -13,11 +13,11 @@ workspace(name = "example_extension")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Pulls proxy wasm cpp SDK with a specific SHA
+# Pulls proxy wasm cpp SDK with a specific SHA. Here the SHA is set to the same as istio/envoy 1.8 branch
 http_archive(
     name = "proxy_wasm_cpp_sdk",
-    strip_prefix = "proxy-wasm-cpp-sdk-2ccab8dfc0b435f3d7641cef7683c7861e23d179",
-    url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/2ccab8dfc0b435f3d7641cef7683c7861e23d179.tar.gz",
+    strip_prefix = "proxy-wasm-cpp-sdk-f5ecda129d1e45de36cb7898641ac225a50ce7f0",
+    url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/f5ecda129d1e45de36cb7898641ac225a50ce7f0.tar.gz",
 )
 
 load("@proxy_wasm_cpp_sdk//bazel/dep:deps.bzl", "wasm_dependencies")
@@ -29,7 +29,7 @@ load("@proxy_wasm_cpp_sdk//bazel/dep:deps_extra.bzl", "wasm_dependencies_extra")
 wasm_dependencies_extra()
 ```
 
-You can rename the workspace to anything relevent to your extension. Other dependencies could also be imported as needed, such as JSON library, base64 library, etc. See the top level `WORKSPACE` file for examples.
+Currently, it is recommanded to update SHA of Wasm C++ SDK and build your extension following Istio releases. See [step 7](#step-7-maintain-your-extension-along-with-istio-releases) for more details on extension maintainance. (TODO: https://github.com/istio-ecosystem/wasm-extensions/issues/27) You can rename the workspace to anything relevent to your extension. Other dependencies could also be imported as needed, such as JSON library, base64 library, etc. See the [top level `WORKSPACE` file](../WORKSPACE) for examples.
 
 ## Step 2: Set up extension scaffold
 ---
