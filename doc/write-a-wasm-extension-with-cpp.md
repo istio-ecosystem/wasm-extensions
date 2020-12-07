@@ -77,8 +77,8 @@ After adding the method, build the extension again with the bazel command mentio
 
 To enable quick iteration and deploy your extension with confidence, it is **highly** recommended to write integration tests with your extension and the same Envoy binary Istio proxy runs. To achieve this, the same [Golang integration test framework](https://godoc.org/github.com/istio/proxy/test/envoye2e) for Telemetry v2 filter could be used, which at high level does the follows:
 * Downloads Envoy binary, which is built by Istio proxy postsubmit and used in istio proxy docker container.
-* Spins up Envoy processes locally with customizable bootstrap template.
-* Spins up a xDS server locally, which serves customizable xDS resources. In the test logic, the xDS resource will reference the local WebAssembly extension files built at former steps.
+* Spawns up Envoy processes locally with customizable bootstrap template.
+* Spawns up a xDS server locally, which serves customizable xDS resources. In the test logic, the xDS resource will reference the local WebAssembly extension files built at former steps.
 * Executes test logic which sends request through Envoy, then examines extension logic accordingly.
 	
 An [integration test](../example/test) is also added to the example extension, which starts up a Envoy process, configures it with a Listener which points to local example Wasm file, sends a HTTP GET request, and verifies that the response header has the desired header. To learn more about how to write an integration test, please refer to this [guide](./write-integration-test.md).
