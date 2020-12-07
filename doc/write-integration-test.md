@@ -8,15 +8,15 @@ Before deploying your Wasm extensions in production, it is **highly** recommende
 
 The reference document about the test framework could be found [here](https://godoc.org/github.com/istio/proxy/test/envoye2e/driver). At the high level, the test framework:
 * Downloads Envoy binary, which is built by Istio proxy postsubmit and used in istio proxy docker container.
-* Spawns up a xDS server locally, which serves customizable xDS resources. In your test, the XDS resource will point to your own Wasm extension.
-* Spawns up Envoy processes locally with customizable bootstrap template.
-* Executes test logic which sends request through Envoy, then examines extension logic accordingly.
+* Spawns up an xDS server locally, which serves customizable xDS resources. In your test, the XDS resource will point to your own Wasm extension.
+* Spawns up Envoy processes locally with customizable bootstrap templates.
+* Executes test logic which sends requests through Envoy, then examines extension logic accordingly.
 
-To take a more detailed look, the test framework models every operation in the test as a [`Step`](https://godoc.org/github.com/istio/proxy/test/envoye2e/driver#Step). For example, one of the most important steps is [`Envoy`](https://godoc.org/github.com/istio/proxy/test/envoye2e/driver#Envoy), which downloads and spawns an Envoy process in `Run` method, and stops the process in `Clean up` method.
+To take a more detailed look, the test framework models every operation in the test as a [`Step`](https://godoc.org/github.com/istio/proxy/test/envoye2e/driver#Step). For example, one of the most important steps is [`Envoy`](https://godoc.org/github.com/istio/proxy/test/envoye2e/driver#Envoy), which downloads and spawns an Envoy process in `Run` method, and stops the process in `Cleanup` method.
 
-Every `Run` method implementation takes a [`Params`](https://godoc.org/github.com/istio/proxy/test/envoye2e/driver#Params) struct as input, which should be created at the beginning of the test and carries test context that is shared by all `Steps`. Information provided by `Params` including:
-* Port assignment, such as port assigned to client Envoy, server Envoy, and XDS server.
-* Variable map, which used to fill in templates for various Envoy configuration.
+Every `Run` method implementation takes a [`Params`](https://godoc.org/github.com/istio/proxy/test/envoye2e/driver#Params) struct as input, which should be created at the beginning of the test and carries test context that is shared by all `Steps`. Information provided by `Params` includes:
+* Port assignment, such as port numbers assigned to the client Envoy, the server Envoy, and the xDS server.
+* Variable map, which is used to fill in templates for various Envoy configuration.
 * Server state of XDS server.
 
 In the following guide, we will walk through the [integration test for the example extension](../example/test/example_test.go). which verifies that the example extension could inject header to the response header. Several snippets are provided at the end for more complicated usage.
@@ -26,7 +26,7 @@ In the following guide, we will walk through the [integration test for the examp
 
 As the first step of the test, a `Params` struct is created. Besides the Golang testing object, the other two variables are passed in:
 * a string map, which will be copied to `Vars` string map in `Params`. `Vars` are used to fill in all kinds of template that are used in the test, such as Envoy bootstrap configuration, listener configuration, filter configuration, etc. We will look at how `Vars` are used later.
-* a test inventory, which lists all tests that could be ran by go test. Inside the function, each test is going to have a unique set of ports assigned, which will be used later when spawn up Envoy and XDS server. Test inventory is to make sure that there is no port collision. For example, [here](https://github.com/istio/proxy/blob/32a5195862266bc49faa94bfb88d1719420abb3b/test/envoye2e/inventory.go#L21) is the test inventory of `istio/proxy`.
+* a test inventory, which lists all tests that could be ran by go test. Inside the function, each test is going to have a unique set of ports assigned, which will be used later when spawn up Envoy and XDS server. Test inventory is to prevent port collision. For example, [here](https://github.com/istio/proxy/blob/32a5195862266bc49faa94bfb88d1719420abb3b/test/envoye2e/inventory.go#L21) is the test inventory of `istio/proxy`.
 ```go
 params := driver.NewTestParams(t, map[string]string{
 		"ExampleWasmFile": filepath.Join(env.GetBazelBinOrDie(), "example.wasm"),
