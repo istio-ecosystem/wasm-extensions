@@ -15,7 +15,7 @@ This repository contains several canonical Wasm extensions, which intend to demo
 
 ## C++
 * [Development set up](doc/development-setup.md)
-* [Write, test, and deploy, and maintain a Wasm extension](./doc/write-a-wasm-extension-with-cpp.md)
+* [Write, test, deploy, and maintain a Wasm extension](./doc/write-a-wasm-extension-with-cpp.md)
 
 ## Test
 * [Write integration test for Wasm extension](./doc/write-integration-test.md)
