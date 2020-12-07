@@ -1,6 +1,6 @@
 # Wasm Extension C++ Unit Test Dev Guide
 
-> **NOTE:** This guide requires familiarity with [GoogleTest framework](https://github.com/google/googletest). Please go through the its [getting started guide](https://github.com/google/googletest#getting-started) first.
+> **NOTE:** This guide requires familiarity with [GoogleTest framework](https://github.com/google/googletest). Please go through its [getting started guide](https://github.com/google/googletest#getting-started) first.
 
 ## Overview
 ---
