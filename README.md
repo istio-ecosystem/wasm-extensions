@@ -19,7 +19,7 @@ This repository contains several canonical Wasm extensions, which intend to demo
 
 ## Test
 * [Write integration test for Wasm extension](./doc/write-integration-test.md)
-* [Write unit test for Wasm extension](./doc/write-unit-test.md)
+* [Write unit test for Wasm extension](./doc/write-cpp-unit-test.md)
 
 [test-badge]: https://github.com/istio-ecosystem/wasm-extensions/workflows/Test/badge.svg
 [test-link]: https://github.com/istio-ecosystem/wasm-extensions/actions?query=workflow%3ATest
