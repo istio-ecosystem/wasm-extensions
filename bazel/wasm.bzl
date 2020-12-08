@@ -20,17 +20,22 @@ def wasm_libraries():
         urls = ["https://github.com/google/googletest/archive/release-1.10.0.tar.gz"],
     )
 
+    PROXY_WASM_CPP_HOST_SHA = "a044a3a5bec75ce57c12d9e2b0e95e2a14f9f944"
+    PROXY_WASM_CPP_HOST_SHA256 = "619e61997682931e07e92f5b64a4268715598d3aa22a41cadeeca816103d731f"
+    BORINGSSL_SHA = "2192bbc878822cf6ab5977d4257a1339453d9d39"
+    BORINGSSL_SHA256 = "bb55b0ed2f0cb548b5dce6a6b8307ce37f7f748eb9f1be6bfe2d266ff2b4d52b"
+
     http_archive(
         name = "proxy_wasm_cpp_host",
-        sha256 = "619e61997682931e07e92f5b64a4268715598d3aa22a41cadeeca816103d731f",
-        strip_prefix = "proxy-wasm-cpp-host-a044a3a5bec75ce57c12d9e2b0e95e2a14f9f944",
-        url = "https://github.com/proxy-wasm/proxy-wasm-cpp-host/archive/a044a3a5bec75ce57c12d9e2b0e95e2a14f9f944.tar.gz",
+        sha256 = PROXY_WASM_CPP_HOST_SHA256,
+        strip_prefix = "proxy-wasm-cpp-host-" + PROXY_WASM_CPP_HOST_SHA,
+        url = "https://github.com/proxy-wasm/proxy-wasm-cpp-host/archive/" + PROXY_WASM_CPP_HOST_SHA +".tar.gz",
     )
 
     # needed by proxy wasm cpp host
     http_archive(
         name = "boringssl",
-        sha256 = "bb55b0ed2f0cb548b5dce6a6b8307ce37f7f748eb9f1be6bfe2d266ff2b4d52b",
-        strip_prefix = "boringssl-2192bbc878822cf6ab5977d4257a1339453d9d39",
-        urls = ["https://github.com/google/boringssl/archive/2192bbc878822cf6ab5977d4257a1339453d9d39.tar.gz"],
+        sha256 = BORINGSSL_SHA256,
+        strip_prefix = "boringssl-" + BORINGSSL_SHA,
+        urls = ["https://github.com/google/boringssl/archive/" + BORINGSSL_SHA + ".tar.gz"],
     )
