@@ -31,13 +31,11 @@ trap "rm -rf ${ENVOY_TMP_DIR}" EXIT
 
 cd ${ENVOY_TMP_DIR}
 if [[ ${RELEASE} == "master" ]]; then
-  git clone https://github.com/envoyproxy/envoy
-  cd envoy
+  git clone --depth=1 --branch master https://github.com/envoyproxy/envoy
 else
-  git clone https://github.com/istio/envoy
-  cd envoy
-  git checkout release-${RELEASE}
+  git clone --depth=1 --branch release-${RELEASE} https://github.com/istio/envoy
 fi
+cd envoy
 
 # SDK SHA update
 NEW_SDK_SHA=$(bazel query //external:proxy_wasm_cpp_sdk --output=build | grep -Pom1 "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/\K[a-zA-Z0-9]{40}")
@@ -65,11 +63,12 @@ trap "rm -rf ${ISTIO_PROXY_TMP_DIR}" EXIT
 
 cd ${ISTIO_PROXY_TMP_DIR}
 
-git clone https://github.com/istio/proxy
-cd proxy
-if [[ ${RELEASE} != "master" ]]; then
-  git checkout release-${RELEASE}
+if [[ ${RELEASE} == "master" ]]; then
+  git clone --depth=1 --branch master https://github.com/istio/proxy
+else
+  git clone --depth=1 --branch release-${RELEASE} https://github.com/istio/proxy
 fi
+cd proxy
 
 NEW_PROXY_SHA=$(git rev-parse HEAD)
 NEW_PROXY_SHA256=$(wget https://github.com/istio/proxy/archive/${NEW_PROXY_SHA}.tar.gz && sha256sum ${NEW_PROXY_SHA}.tar.gz | grep -Pom1 "\K[a-zA-Z0-9]{64}")
