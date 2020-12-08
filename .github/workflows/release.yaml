@@ -1,13 +1,13 @@
+name: Release
+
 on:
   push:
     tags:
-    - '*'
-
-name: Upload Release Asset
+      - '*'
 
 jobs:
-  build:
-    name: Upload Release Asset
+  release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
