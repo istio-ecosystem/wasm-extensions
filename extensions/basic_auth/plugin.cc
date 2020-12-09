@@ -131,10 +131,22 @@ bool extractBasicAuthRule(
             if (credential.second != Wasm::Common::JsonParserResultDetail::OK) {
               return false;
             }
-            rule.encoded_credentials.insert(
-                Base64::encode(credential.first.value().data(),
-                               credential.first.value().size()));
-            return true;
+            // Check if credential has `:` in it. If it has, it needs to be
+            // base64 encoded.
+            if (absl::StrContains(credential.first.value(), ":")) {
+              rule.encoded_credentials.insert(
+                  Base64::encode(credential.first.value().data(),
+                                 credential.first.value().size()));
+              return true;
+            }
+            // Otherwise, try base64 decode and insert into credential list if
+            // it can be decoded.
+            if (!Base64::decodeWithoutPadding(credential.first.value())
+                     .empty()) {
+              rule.encoded_credentials.insert(credential.first.value());
+              return true;
+            }
+            return false;
           })) {
     LOG_WARN("failed to parse configuration for credentials.");
     return false;

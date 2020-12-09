@@ -91,12 +91,12 @@ TEST_F(BasicAuthTest, OnConfigureSuccess) {
     { 
       "prefix": "/api",
       "request_methods":[ "GET", "POST" ],
-      "credentials":[ "ok:test", "admin:admin", "admin2:admin2" ] 
+      "credentials":[ "ok:test", "admin:admin", "admin2:admin2", "YWRtaW4zOmFkbWluMw==" ]
     },
     { 
       "exact": "/api",
       "request_methods":[ "GET", "POST" ],
-      "credentials":[ "admin:admin", "admin2:admin2", "ok:test" ] 
+      "credentials":[ "admin:admin", "admin2:admin2", "ok:test", "YWRtaW4zOmFkbWluMw==" ]
     }
   ]
 })";
@@ -227,7 +227,7 @@ TEST_F(BasicAuthTest, PrefixAllow) {
     { 
       "prefix": "/api",
       "request_methods":[ "GET", "POST" ],
-      "credentials":[ "ok:test", "admin:admin", "admin2:admin2" ] 
+      "credentials":[ "ok:test", "admin:admin", "admin2:admin2", "YWRtaW4zOmFkbWluMw==" ]
     }
   ]
 })";
@@ -249,6 +249,13 @@ TEST_F(BasicAuthTest, PrefixAllow) {
   path_ = "/api/config";
   method_ = "POST";
   cred_ = "admin2:admin2";
+  authorization_header_ = "Basic " + Base64::encode(cred_.data(), cred_.size());
+  EXPECT_EQ(context_->onRequestHeaders(0, false),
+            FilterHeadersStatus::Continue);
+
+  path_ = "/api/config";
+  method_ = "POST";
+  cred_ = "admin3:admin3";
   authorization_header_ = "Basic " + Base64::encode(cred_.data(), cred_.size());
   EXPECT_EQ(context_->onRequestHeaders(0, false),
             FilterHeadersStatus::Continue);

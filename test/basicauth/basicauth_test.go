@@ -35,6 +35,13 @@ var TestCases = []struct {
 		ResponseCode:   401,
 	},
 	{
+		Name:           "Base64Credentials",
+		Method:         "POST",
+		Path:           "/api/reviews/pay",
+		RequestHeaders: map[string]string{"Authorization": "Basic YWRtaW4zOmFkbWluMw=="},
+		ResponseCode:   200,
+	},
+	{
 		Name:         "MissingCredentials",
 		Method:       "GET",
 		Path:         "/api/reviews/pay",
@@ -65,7 +72,7 @@ func TestBasicAuth(t *testing.T) {
 			params := driver.NewTestParams(t, map[string]string{
 				"BasicAuthWasmFile": filepath.Join(env.GetBazelBinOrDie(), "extensions/basic_auth/basic_auth.wasm"),
 			}, test.ExtensionE2ETests)
-			params.Vars["ServerHTTPFilters"] = params.LoadTestData("testdata/basic_auth/server_filter.yaml.tmpl")
+			params.Vars["ServerHTTPFilters"] = params.LoadTestData("test/basicauth/testdata/server_filter.yaml.tmpl")
 			if err := (&driver.Scenario{
 				[]driver.Step{
 					&driver.XDS{},
