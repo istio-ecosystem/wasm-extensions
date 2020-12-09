@@ -20,6 +20,10 @@ jobs:
         run: |
           COMMIT=$(git rev-list -n 1 ${{ github.ref }})
           gsutil cp gs://istio-ecosystem/wasm-extensions/basic-auth/${COMMIT}.wasm basic-auth.wasm
+          # Also prepare an Wasm extension dir for GCS uploading.
+          mkdir -p wasm-extensions/basic-auth
+          GITHUB_TAG_REF=${{ github.ref }}
+          cp basic-auth.wasm wasm-extensions/basic-auth/${GITHUB_TAG_REF##*/}.wasm
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -40,3 +44,9 @@ jobs:
           asset_path: ./basic-auth.wasm
           asset_name: basic-auth.wasm
           asset_content_type: application/wasm
+      - name: Upload Modules
+        uses: GoogleCloudPlatform/github-actions/upload-cloud-storage@master
+        with:
+          path: wasm-extensions/
+          destination: istio-ecosystem
+          credentials: ${{ secrets.WASM_UPLOAD_CRED }}
