@@ -1,78 +1,76 @@
-# Istio Basic Auth Filter
+# Basic Auth Filter User Guide
 
-This folder contains a Basic Authentication WebAssembly filter implementation, which could be loaded dynamically at Istio proxy.
-Currently this filter is written and tested against 1.7 Istio proxy. (TODO: add postsubmit to upload basic auth wasm extensions)
+> **Note**: This is an experimental feature and not recommended for production usage.
 
-## Install
+Basic Auth filter is shipped as a WebAssembly filter from this repo. It is versioned following Istio minor release (e.g. basic auth Wasm module with version 1.8.x should work with any Istio 1.8 patch versions). All released versions could be found [here](https://github.com/istio-ecosystem/wasm-extensions/releases).
 
-To try out basic auth filter with 1.7 Istio proxy:
+## Deploy basic auth filter
+---
 
-1) install [extension distribution server](https://github.com/istio/proxy/tree/master/tools/extensionserver#usage),
-   and configure it to fetch and generate basic auth filter configuration as following:
+In the following guide we will configure Istio proxy to download Basic Auth filter remotely from Google Cloud Storage. You may choose any preferred blob service to host the module (**Note**: Envoy does not work with downloading from github, since it currently cannot handle 302 redirect when downloading from remote data source).
 
-   ```yaml
-    apiVersion: v1
-    kind: ConfigMap
-    metadata:
-    name: extensionserver
-    data:
-    extension.yaml: |
-        extensions:
-        - name: istio.basic_auth
-        url: https://storage.googleapis.com/wasm-test/basic_auth.wasm
-        runtime: v8
-        configuration:
-            basic_auth_rules:
-            - prefix: /
-              request_methods:
-                - GET
-                - POST
-              credentials:
-                - ok:test
-                - admin:admin
-                - admin2:admin2
-   ```
+First apply [an `EnvoyFilter`](./config/storage-cluster.yaml) to register a `google-storage` service within proxy.
 
-1) Apply EnvoyFilter to inject basic auth filter into http filter chain. The filter will be configured to fetch basic auth 
-   WebAssembly module from the extension server. The following example EnvoyFilter applies basic auth filter to the
-   ingressgateway proxy. Note the name of the filter has to be the same as the one specified in config map.
+Then apply another `EnvoyFilter` to inject basic auth filter into HTTP filter chain. For example, [this configuration](./config/gateway-filter.yaml) injects the basic auth filter to `gateway`. Most of the configuration is boilerplate, the important parts are:
 
-   ```yaml
-    apiVersion: networking.istio.io/v1alpha3
-    kind: EnvoyFilter
-    metadata:
-      name: basic-auth-1.7
-      namespace: istio-system
-    spec:
-      configPatches:
-      - applyTo: HTTP_FILTER
-        match:
-          context: GATEWAY
-          listener:
-            filterChain:
-              filter:
-                name: envoy.http_connection_manager
-          proxy:
-            proxyVersion: ^1\.7.*
-        patch:
-          operation: INSERT_BEFORE
-          value:
-            name: istio.basic_auth
-            config_discovery:
-              config_source:  
-                api_config_source:
-                  api_type: GRPC
-                  transport_api_version: V3
-                  grpc_services:
-                  - google_grpc:
-                      target_uri: extensionserver.default.svc.cluster.local:8080
-                      stats_uri: extensionserver
-              type_urls: ["envoy.extensions.filters.http.wasm.v3.Wasm"]
-   ```
+* The `EnvoyFilter` matches gateway proxy with version 1.8, since the module downloaded is of version 1.8.
+  ```yaml
+  - applyTo: HTTP_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        filterChain:
+          filter:
+            name: envoy.http_connection_manager
+      proxy:
+        proxyVersion: ^1\.8.*
+  ```
+* Basic auth rules, which configures basic auth filter to do auth check based on prefix, HTTP method, and the given credentials.
+  ```json
+  {
+    "basic_auth_rules": [
+      {
+        "prefix": "/",
+        "request_methods": ["GET", "POST"],
+        "credentials": [
+          "ok:test",
+          "admin:admin",
+          "admin2:admin2"
+        ]
+      }
+    ]
+  }
+  ```
+* Module downloading URL and checksum. To get the checksum, you can use `sha256sum` command: `sha256sum ${YOUR_WASM_MODULE}`.
+  ```yaml
+  remote:
+    http_uri:
+      uri: https://storage.googleapis.com/istio-ecosystem/wasm-extensions/basic-auth/1.8.0.wasm
+      cluster: google-storage
+      timeout: 10s
+    sha256: 707e29db817f76c974d7ce1fe2f61ad64c88856c7ddba99a36fe95439bfe1281
+  ```
 
-## Configuration
+After applying the filter, gateway should start enforce the basic auth rule. Use `productpage` app as an example, to test that the rule works, you can curl with and without the authorization header. For example
+```console
+foo@bar:~$ curl -i <GATEWAY_URL>/productpage
+HTTP/1.1 401 Unauthorized
+date: Wed, 09 Dec 2020 18:06:21 GMT
+server: istio-envoy
+content-length: 0
+foo@bar:~$ curl -i -H "authorization: Basic YWRtaW4yOmFkbWluMg==" <GATEWAY_URL>/productpage
+HTTP/1.1 200 OK
+content-type: text/html; charset=utf-8
+content-length: 4063
+server: istio-envoy
+date: Wed, 09 Dec 2020 18:07:19 GMT
+x-envoy-upstream-service-time: 85
+```
 
-The following proto describes the schema of basic auth filter configuration.
+## Configuration Reference
+---
+
+The following proto message describes the schema of basic auth filter configuration.
 
 ```protobuf
 message PluginConfig {
@@ -102,3 +100,12 @@ message BasicAuth {
   repeated string credentials = 5;
 }
 ```
+
+## Feature Request and Customization
+---
+
+If you have any feature request or bug report, please open an issue in this repo. Currently it is on the roadmap to:
+- [ ] Read secret from local file. This is pending on Wasm ABI supporting file read.
+- [ ] Add regex to path matching
+
+It is recommended to customize the extension according to your needs. Please take a look at [Wasm extension C++ development guide](../doc/write-a-wasm-extension-with-cpp.md) for more information about how to write your own extension.
