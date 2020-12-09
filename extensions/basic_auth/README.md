@@ -98,6 +98,7 @@ message BasicAuth {
   repeated string request_methods = 4;
 
   // Credentials provided in the form username:password that have access.
+  // Credential could be provided in two formats: `USERNAME:PASSWD` and base64 encoded credentials.
   repeated string credentials = 5;
 }
 ```
