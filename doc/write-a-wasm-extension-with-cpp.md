@@ -29,7 +29,7 @@ load("@proxy_wasm_cpp_sdk//bazel/dep:deps_extra.bzl", "wasm_dependencies_extra")
 wasm_dependencies_extra()
 ```
 
-Currently, it is recommanded to update SHA of Wasm C++ SDK and build your extension following Istio releases. See [step 7](#step-7-maintain-your-extension-along-with-istio-releases) for more details on extension maintainance. (TODO: https://github.com/istio-ecosystem/wasm-extensions/issues/27) You can rename the workspace to anything relevent to your extension. Other dependencies could also be imported as needed, such as JSON library, base64 library, etc. See the [top level `WORKSPACE` file](../WORKSPACE) for examples.
+Currently, it is recommanded to update SHA of Wasm C++ SDK and build your extension following Istio releases. See [step 7](#step-7-maintain-your-extension-along-with-istio-releases) for more details on extension maintainance. To get SHA and checksum of various dependencies, you can run [`get-dep.sh`](../scripts/get-dep.sh). For example, to get SHA of 1.8 dependencies, run `./scripts/get-dep.sh -r 1.8`. You can rename the workspace to anything relevent to your extension. Other dependencies could also be imported as needed, such as JSON library, base64 library, etc. See the [top level `WORKSPACE` file](../WORKSPACE) for examples.
 
 ## Step 2: Set up extension scaffold
 ---
