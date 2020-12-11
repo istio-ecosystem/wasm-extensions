@@ -9,24 +9,16 @@ This guide will walk you through how to write, test, deploy, and maintain a HTTP
 Create a folder for the extension code. Under the folder, craete a `WORKSPACE` file , which pulls in proxy wasm cpp SDK and necessary toolchain dependencies to build a Wasm filter. The follow is a minimum `WORKSPACE` file used by the example Wasm extension, which pulls the C++ proxy Wasm SDK and invoke several rules to import tool chain:
 
 ```python
-workspace(name = "example_extension")
+# Pulls proxy wasm cpp SDK with a specific SHA
+PROXY_WASM_CPP_SDK_SHA = "7afb39d868a973caa6216a535c24e37fb666b6f3"
+PROXY_WASM_CPP_SDK_SHA256 = "213d0b441bcc3df2c87933b24a593b5fd482fa8f4db158b707c60005b9e70040"
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-# Pulls proxy wasm cpp SDK with a specific SHA. Here the SHA is set to the same as istio/envoy 1.8 branch
 http_archive(
     name = "proxy_wasm_cpp_sdk",
-    strip_prefix = "proxy-wasm-cpp-sdk-f5ecda129d1e45de36cb7898641ac225a50ce7f0",
-    url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/f5ecda129d1e45de36cb7898641ac225a50ce7f0.tar.gz",
+    sha256 = PROXY_WASM_CPP_SDK_SHA256,
+    strip_prefix = "proxy-wasm-cpp-sdk-" + PROXY_WASM_CPP_SDK_SHA,
+    url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/" + PROXY_WASM_CPP_SDK_SHA + ".tar.gz",
 )
-
-load("@proxy_wasm_cpp_sdk//bazel/dep:deps.bzl", "wasm_dependencies")
-
-wasm_dependencies()
-
-load("@proxy_wasm_cpp_sdk//bazel/dep:deps_extra.bzl", "wasm_dependencies_extra")
-
-wasm_dependencies_extra()
 ```
 
 Currently, it is recommanded to update SHA of Wasm C++ SDK and build your extension following Istio releases. See [step 7](#step-7-maintain-your-extension-along-with-istio-releases) for more details on extension maintainance. (TODO: https://github.com/istio-ecosystem/wasm-extensions/issues/27) You can rename the workspace to anything relevent to your extension. Other dependencies could also be imported as needed, such as JSON library, base64 library, etc. See the [top level `WORKSPACE` file](../WORKSPACE) for examples.
@@ -93,80 +85,9 @@ An unit test example could be found under the [basic auth plugin](../extensions/
 ## Step 6: Push and deploy the extension
 ---
 
-After the extension has been verified and tested, it is time to deploy the extension with Istio! Assume you have already deployed a [httpbin example app](https://github.com/istio/istio/tree/master/samples/httpbin) in your cluster, and the extension has been pushed to a blob serving service, you can use EnvoyFilter to inject the example extension:
+After the extension has been verified and tested, it is time to deploy the extension with Istio! Assume you have already deployed a [httpbin example app](https://github.com/istio/istio/tree/master/samples/httpbin) in your cluster, and the extension has been pushed to a blob serving service. We will use `Google Cloud Storage` as example.
 
-Apply the following [EnvoyFilter](../example/config/storage-cluster.yaml) to register the blob service cluster for Extension downloading. Here we use Google Cloud Storage as an example:
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: EnvoyFilter
-metadata:
-  name: example-cluster
-spec:
-  configPatches:
-  - applyTo: CLUSTER
-    match:
-      context: SIDECAR_INBOUND
-    patch:
-      operation: ADD
-      value: # cluster specification
-        name: google-storage
-        dns_lookup_family: V4_ONLY
-        type: STRICT_DNS
-        connect_timeout: 5s
-        transport_socket:
-          name: envoy.transport_sockets.tls
-        load_assignment:
-          cluster_name: storage.googleapis.com
-          endpoints:
-          - lb_endpoints:
-            - endpoint:
-                address:
-                  socket_address:
-                    address: storage.googleapis.com
-                    port_value: 443
-```
-
-Then apply the following [EnvoyFilter](../example/config/example-filter.yaml) to inject the extension into inbound sidecar listeners:
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: EnvoyFilter
-metadata:
-  name: example-filter
-spec:
-  configPatches:
-  - applyTo: HTTP_FILTER
-    match:
-      context: SIDECAR_INBOUND
-      listener:
-        filterChain:
-          filter:
-            name: envoy.http_connection_manager
-            subFilter:
-              name: envoy.router
-    patch:
-      operation: INSERT_BEFORE
-      value:
-        name: example-filter
-        typed_config:
-          '@type': type.googleapis.com/udpa.type.v1.TypedStruct
-          type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
-          value:
-            config:
-              vm_config:
-                code:
-                  remote:
-                    http_uri:
-                      uri: https://storage.googleapis.com/istio-ecosystem/wasm-extensions/example.wasm
-                      cluster: google-storage
-                      timeout: 10s
-                    retry_policy:
-                      num_retries: 5
-                      retry_back_off:
-                        base_interval: 1s
-                        max_interval: 3s
-                    sha256: a96aacb4fa8fd81bb7a7112b1d46432ec1463b8142d320bc269533832aa3d9a7
-                runtime: envoy.wasm.runtime.v8
-```
+First step is to apply an [EnvoyFilter](../example/config/storage-cluster.yaml) to register the blob service cluster which will be used for Wasm module downloading. Then apply the following [EnvoyFilter](../example/config/example-filter.yaml) to inject the extension to the inbound sidecar listeners, which fetches and loads the example Wasm module.
 
 Now curl the `httpbin` service, and `x-custom-foo` should be added into the response!
 ```
