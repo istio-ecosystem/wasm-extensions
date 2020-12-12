@@ -10,8 +10,8 @@ Create a folder for the extension code. Under the folder, craete a `WORKSPACE` f
 
 ```python
 # Pulls proxy wasm cpp SDK with a specific SHA
-PROXY_WASM_CPP_SDK_SHA = "7afb39d868a973caa6216a535c24e37fb666b6f3"
-PROXY_WASM_CPP_SDK_SHA256 = "213d0b441bcc3df2c87933b24a593b5fd482fa8f4db158b707c60005b9e70040"
+PROXY_WASM_CPP_SDK_SHA = "f5ecda129d1e45de36cb7898641ac225a50ce7f0"
+PROXY_WASM_CPP_SDK_SHA256 = "0f675ef5c4f8fdcf2fce8152868c6c6fd33251a0deb4a8fc1ef721f9ed387dbc"
 
 http_archive(
     name = "proxy_wasm_cpp_sdk",
