@@ -51,13 +51,17 @@ jobs:
             mkdir -p wasm-extensions/${EXTENSION_NAME//_/-}
             cp bazel-bin/${WASM_PATH} wasm-extensions/${EXTENSION_NAME//_/-}/${GITHUB_SHA}.wasm
 
-            # also push binary with more readable name, so that it could be easily used in configuration and documentation.
-            # for example, the following command is going to push 'basic_auth/<SHA>.wasm' to 'basic_auth/1.7-2020-11-18-08-09-10' and 'basic_auth/1.7-latest'.
-            cp wasm-extensions/${EXTENSION_NAME//_/-}/${GITHUB_SHA}.wasm wasm-extensions/${EXTENSION_NAME//_/-}/${VERSION}-$(date +"%Y-%m-%d-%H-%M-%S").wasm
-            cp wasm-extensions/${EXTENSION_NAME//_/-}/${GITHUB_SHA}.wasm wasm-extensions/${EXTENSION_NAME//_/-}/${VERSION}-latest.wasm 
-
             # TODO: add precompiled module
           done
+
+      - name: Build Example
+        run: |
+          set -eux
+          pushd example
+          bazel build //:example.wasm
+          popd
+          mkdir -p wasm-extensions/example
+          cp example/bazel-bin/example.wasm wasm-extensions/example/${GITHUB_SHA}.wasm
 
       - name: Upload Modules
         uses: GoogleCloudPlatform/github-actions/upload-cloud-storage@master
