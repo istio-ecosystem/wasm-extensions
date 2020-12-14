@@ -54,15 +54,6 @@ jobs:
             # TODO: add precompiled module
           done
 
-      - name: Build Example
-        run: |
-          set -eux
-          pushd example
-          bazel build //:example.wasm
-          popd
-          mkdir -p wasm-extensions/example
-          cp example/bazel-bin/example.wasm wasm-extensions/example/${GITHUB_SHA}.wasm
-
       - name: Upload Modules
         uses: GoogleCloudPlatform/github-actions/upload-cloud-storage@master
         with:
