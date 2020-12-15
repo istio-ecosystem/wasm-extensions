@@ -10,17 +10,3 @@ wasm_cc_binary(
         "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
     ],
 )
-
-cc_library(
-    name = "scaffold",
-    srcs = [
-        "plugin.cc",
-    ],
-    hdrs = [
-        "plugin.h",
-    ],
-    copts = ["-DNULL_PLUGIN"],
-    deps = [
-        "@proxy_wasm_cpp_host//:lib",
-    ],
-)
