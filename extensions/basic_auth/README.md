@@ -1,6 +1,8 @@
 # Basic Auth Filter User Guide
 
-> **Note**: This is an experimental feature and not recommended for production usage.
+> **Note**: This is an experimental feature.
+
+> **Note**: Basic Auth is not recommended for production usage since it is not secure enough. Please consider using Istio mTLS instead in production.
 
 Basic Auth filter is shipped as a WebAssembly filter from this repo. It is versioned following Istio minor release (e.g. basic auth Wasm module with version 1.8.x should work with any Istio 1.8 patch versions). All released versions could be found [here](https://github.com/istio-ecosystem/wasm-extensions/releases).
 
