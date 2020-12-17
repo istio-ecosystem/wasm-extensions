@@ -7,10 +7,10 @@ wasm_cc_binary(
         "plugin.h",
     ],
     deps = [
-        "@com_google_absl//absl/container:flat_hash_map",
         "//extensions/local_ratelimit/config/v1alpha1:local_ratelimit_config_cc_proto",
-        "@proxy_wasm_cpp_sdk//contrib:contrib_lib",
+        "@com_google_absl//absl/container:flat_hash_map",
         "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
+        "@proxy_wasm_cpp_sdk//contrib:contrib_lib",
     ],
 )
 
@@ -25,8 +25,8 @@ cc_library(
     copts = ["-DNULL_PLUGIN"],
     deps = [
         "//extensions/local_ratelimit/config/v1alpha1:local_ratelimit_config_cc_proto",
+        "@com_google_absl//absl/container:flat_hash_map",
         "@proxy_wasm_cpp_host//:lib",
         "@proxy_wasm_cpp_sdk//contrib:contrib_lib",
-        "@com_google_absl//absl/container:flat_hash_map",
     ],
 )
