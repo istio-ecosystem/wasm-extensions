@@ -50,7 +50,7 @@ func TestLocalRateLimitFilter(t *testing.T) {
 					},
 					&driver.Envoy{
 						Bootstrap:       params.FillTestData(string(testdata.MustAsset("bootstrap/server.yaml.tmpl"))),
-						DownloadVersion: "1.7.0",
+						DownloadVersion: "1.8",
 					},
 					&driver.Sleep{Duration: 1 * time.Second},
 					&driver.Repeat{N: 3,
