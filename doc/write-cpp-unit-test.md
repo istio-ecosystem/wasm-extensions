@@ -7,7 +7,7 @@
 
 In addition to [integration test](./write-integration-test.md), it is also recommended to write unit test for your extension. Unlike integration test, which executes the extension code as Wasm binary with Envoy runtime, unit test is compiled with local C++ toolchains and run natively.
 
-In [`proxy-wasm-cpp-host`](https://github.com/proxy-wasm/proxy-wasm-cpp-host), along with `V8`, `wasmtime`, `WAVM` runtimes, which could interpret Wasm binaries, [a `nullVM` runtime](https://github.com/proxy-wasm/proxy-wasm-cpp-host/tree/master/src/null) is also included, which could compile together with the extension code and run natively. The unit test will utilize `nullVm` runtime. Specifically, all host implementation of `proxy-wasm-cpp-host` (such as Envoy) needs to implements a [`Context` interface class](https://github.com/proxy-wasm/proxy-wasm-cpp-host/blob/eceb02d5b7772ec1cd78a4d35356e57d2e6d59bb/include/proxy-wasm/context.h#L128), which has many unimplemented host specific methods. In the unit test, a mock implementation of the `Context` class will be created using [GoogleTest framework](https://github.com/google/googletest), and compiled with your extension code. Within the mock implementation, we could inject desired host behavior and check if the extension interacts with host as expected.
+In [`proxy-wasm-cpp-host`](https://github.com/proxy-wasm/proxy-wasm-cpp-host), along with `V8`, `wasmtime`, `WAVM` runtimes that execute Wasm binaries, [a `nullVM` runtime](https://github.com/proxy-wasm/proxy-wasm-cpp-host/tree/master/src/null) is also included, which runs natively compiled-in modules. The unit test will utilize `nullVm` runtime. Specifically, all host implementation of `proxy-wasm-cpp-host` (such as Envoy) needs to implements a [`Context` interface class](https://github.com/proxy-wasm/proxy-wasm-cpp-host/blob/eceb02d5b7772ec1cd78a4d35356e57d2e6d59bb/include/proxy-wasm/context.h#L128), which has many unimplemented host specific methods. In the unit test, a mock implementation of the `Context` class will be created using [GoogleTest framework](https://github.com/google/googletest), and compiled with your extension code. Within the mock implementation, we could inject desired host behavior and check if the extension interacts with host as expected.
 
 the following guide will walk through how to write unit test based on [an example test for basic auth filter](../extensions/basic_auth/plugin_test.cc).
 
@@ -68,7 +68,7 @@ PROXY_WASM_NULL_PLUGIN_REGISTRY
 #endif
 ```
 
-Then to build the extension under `nullVM` mode, the following target is added to the `BUILD` file. The target is similiar to the one generates Wasm binary, except that it uses `cc_binary` and defines `NULL_PLUGIN` macro in `copts`.
+Then to build the extension under `nullVM` mode, the following target is added to the `BUILD` file. The target is similiar to the one generated Wasm binary, except that it uses `cc_binary` and defines `NULL_PLUGIN` macro in `copts`.
 
 `BUILD`
 ```python
@@ -91,10 +91,10 @@ cc_library(
 )
 ```
 
-## Step 2: Create scaffold for unit tests
+## Step 2: Create a scaffold for unit tests
 ---
 
-Before implementing test, the scaffold needs to be created, which imports necessary library, adds the namespace wrapper, registers the extension with `nullVM` runtime, and creates a test class which intiliaze the `nullVM` runtime. Unlike extension code, the unit test is always compiled with nullVM mode, so there is no need to wrap the namespace with `NULL_PLUGIN` directive.
+Before implementing test, the scaffold needs to be created, which imports necessary library, adds the namespace wrapper, registers the extension with `nullVM` runtime, and creates a test class which initializes the `nullVM` runtime. Unlike extension code, the unit test is always compiled with nullVM mode, so there is no need to wrap the namespace with `NULL_PLUGIN` directive.
 
 ```cpp
 // necessary library imports for 
