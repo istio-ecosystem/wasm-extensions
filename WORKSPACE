@@ -35,3 +35,12 @@ http_archive(
 load("@istio_ecosystem_wasm_extensions//bazel:wasm.bzl", "wasm_libraries")
 
 wasm_libraries()
+
+# To import proxy wasm cpp host, which will be used in unit testing.
+load("@proxy_wasm_cpp_host//bazel:repositories.bzl", "proxy_wasm_cpp_host_repositories")
+
+proxy_wasm_cpp_host_repositories()
+
+load("@proxy_wasm_cpp_host//bazel:dependencies.bzl", "proxy_wasm_cpp_host_dependencies")
+
+proxy_wasm_cpp_host_dependencies()

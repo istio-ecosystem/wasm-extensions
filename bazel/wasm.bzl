@@ -31,11 +31,3 @@ def wasm_libraries():
         strip_prefix = "proxy-wasm-cpp-host-" + PROXY_WASM_CPP_HOST_SHA,
         url = "https://github.com/proxy-wasm/proxy-wasm-cpp-host/archive/" + PROXY_WASM_CPP_HOST_SHA +".tar.gz",
     )
-
-    # needed by proxy wasm cpp host
-    http_archive(
-        name = "boringssl",
-        sha256 = BORINGSSL_SHA256,
-        strip_prefix = "boringssl-" + BORINGSSL_SHA,
-        urls = ["https://github.com/google/boringssl/archive/" + BORINGSSL_SHA + ".tar.gz"],
-    )
