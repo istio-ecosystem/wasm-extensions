@@ -31,7 +31,7 @@ trap "rm -rf ${ENVOY_TMP_DIR}" EXIT
 
 cd ${ENVOY_TMP_DIR}
 if [[ ${RELEASE} == "master" ]]; then
-  git clone --depth=1 --branch master https://github.com/envoyproxy/envoy
+  git clone --depth=1 --branch main https://github.com/envoyproxy/envoy
 else
   git clone --depth=1 --branch release-${RELEASE} https://github.com/istio/envoy
 fi
