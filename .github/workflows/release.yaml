@@ -38,7 +38,7 @@ jobs:
           draft: false
           prerelease: false
       - name: Upload Basic Auth Release Asset
-        id: upload-release-asset 
+        id: upload-basic-auth-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,7 +48,7 @@ jobs:
           asset_name: basic-auth.wasm
           asset_content_type: application/wasm
       - name: Upload Example Release Asset
-        id: upload-release-asset 
+        id: upload-example-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
