@@ -16,7 +16,26 @@ spec:
     patch:
       operation: INSERT_BEFORE
       value:
-        name: example-filter
+        name: example-filter-config
+        config_discovery:
+          config_source:
+            ads: {}
+            initial_fetch_timeout: 0s
+          type_urls: [ "type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm"]
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: example-filter-config
+spec:
+  configPatches:
+  - applyTo: EXTENSION_CONFIG
+    match:
+      context: SIDECAR_INBOUND
+    patch:
+      operation: ADD
+      value:
+        name: example-filter-config
         typed_config:
           '@type': type.googleapis.com/udpa.type.v1.TypedStruct
           type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
@@ -26,13 +45,10 @@ spec:
                 code:
                   remote:
                     http_uri:
-                      uri: https://storage.googleapis.com/istio-ecosystem/wasm-extensions/example.wasm
-                      cluster: google-storage
-                      timeout: 10s
-                    retry_policy:
-                      num_retries: 5
-                      retry_back_off:
-                        base_interval: 1s
-                        max_interval: 3s
-                    sha256: a96aacb4fa8fd81bb7a7112b1d46432ec1463b8142d320bc269533832aa3d9a7
+                      uri: https://storage.googleapis.com/istio-ecosystem/wasm-extensions/example/1.9.0.wasm
+                    # Optional: specifying checksum will let istio agent
+                    # verify the checksum of download artifacts. Missing
+                    # checksum will cause the Wasm module to be downloaded
+                    # repeatedly
+                    sha256: d53a7f59658b0e154338fc50a4a1545e763ca01b5cc5e013f09c99865ee57aad
                 runtime: envoy.wasm.runtime.v8

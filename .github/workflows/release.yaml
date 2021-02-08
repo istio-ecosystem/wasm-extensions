@@ -47,16 +47,6 @@ jobs:
           asset_path: ./basic-auth.wasm
           asset_name: basic-auth.wasm
           asset_content_type: application/wasm
-      - name: Upload Example Release Asset
-        id: upload-example-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./example.wasm
-          asset_name: example.wasm
-          asset_content_type: application/wasm
       - name: Upload Modules
         uses: GoogleCloudPlatform/github-actions/upload-cloud-storage@master
         with:

@@ -1,59 +1,33 @@
 # Basic Auth Filter User Guide
 
 > **Note**: This is an experimental feature.
-
 > **Note**: Basic Auth is not recommended for production usage since it is not secure enough. Please consider using Istio mTLS instead in production.
 
-Basic Auth filter is shipped as a WebAssembly filter from this repo. It is versioned following Istio minor release (e.g. basic auth Wasm module with version 1.8.x should work with any Istio 1.8 patch versions). All released versions could be found [here](https://github.com/istio-ecosystem/wasm-extensions/releases).
+Basic Auth filter is shipped as a WebAssembly module from this repo.
+It is versioned following Istio minor release (e.g. basic auth Wasm module with version 1.9.x should work with any Istio 1.9 patch versions).
+All released versions could be found [here](https://github.com/istio-ecosystem/wasm-extensions/releases).
 
 ## Deploy basic auth filter
+
 ---
 
-In the following guide we will configure Istio proxy to download Basic Auth filter remotely from Google Cloud Storage. You may choose any preferred blob service to host the module (**Note**: Envoy does not work with downloading from github, since it currently cannot handle 302 redirect when downloading from remote data source).
+In the following guide we will configure Istio proxy to download and apply Basic Auth filter.
 
-First apply [an `EnvoyFilter`](./config/storage-cluster.yaml) to register a `google-storage` service within proxy.
+Two `EnvoyFilter` resources will be applied, to inject basic auth filter into HTTP filter chain.
+For example, [this configuration](./config/gateway-filter.yaml) injects the basic auth filter to `gateway`.
 
-Then apply another `EnvoyFilter` to inject basic auth filter into HTTP filter chain. For example, [this configuration](./config/gateway-filter.yaml) injects the basic auth filter to `gateway`. Most of the configuration is boilerplate, the important parts are:
+The first `EnvoyFilter` will be inject an HTTP filter into gateway proxies.
+It is configured to request the extension configuration named as `istio.basic_auth` from `ads` (i.e. Aggregated Discovery Service), which is the same configuration source that Istiod uses to provide all other configuration resources.
+Along with the configuration source, the initial fetch timeout is also set, in order to prevent filters with slow or failed Wasm module remote fetch becomes effective.
+The second `EnvoyFilter` resource provides configuration for the filter, which is composed as an `EXTENSION_CONFIG` patch and will be distributed to the proxy as an Envoy [`Extension Configuration`](https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/extension) (ECDS) resource.
+Once this update reaches Istio agent, it will download the Wasm module file and store it at the local file system.
+If the download fails, Istio-agent will reject the `Extension Configuration` update and prevent bad Wasm filter configuration from reaching Envoy.
+Most of this `EnvoyFilter` configuration is boilerplate.
 
-* The `EnvoyFilter` matches gateway proxy with version 1.8, since the module downloaded is of version 1.8.
-  ```yaml
-  - applyTo: HTTP_FILTER
-    match:
-      context: GATEWAY
-      listener:
-        filterChain:
-          filter:
-            name: envoy.http_connection_manager
-      proxy:
-        proxyVersion: ^1\.8.*
-  ```
-* Basic auth rules, which configures basic auth filter to do auth check based on prefix, HTTP method, and the given credentials.
-  ```json
-  {
-    "basic_auth_rules": [
-      {
-        "prefix": "/",
-        "request_methods": ["GET", "POST"],
-        "credentials": [
-          "ok:test",
-          "admin:admin",
-          "admin2:admin2"
-        ]
-      }
-    ]
-  }
-  ```
-* Module downloading URL and checksum. To get the checksum, you can use `sha256sum` command: `sha256sum ${YOUR_WASM_MODULE}`.
-  ```yaml
-  remote:
-    http_uri:
-      uri: https://storage.googleapis.com/istio-ecosystem/wasm-extensions/basic-auth/1.8.0.wasm
-      cluster: google-storage
-      timeout: 10s
-    sha256: 707e29db817f76c974d7ce1fe2f61ad64c88856c7ddba99a36fe95439bfe1281
-  ```
+After applying the filter, gateway should start enforce the basic auth rule.
+Use `productpage` app as an example, to test that the rule works, you can curl with and without the authorization header.
+For example
 
-After applying the filter, gateway should start enforce the basic auth rule. Use `productpage` app as an example, to test that the rule works, you can curl with and without the authorization header. For example
 ```console
 foo@bar:~$ curl -i <GATEWAY_URL>/productpage
 HTTP/1.1 401 Unauthorized
@@ -70,6 +44,7 @@ x-envoy-upstream-service-time: 85
 ```
 
 ## Configuration Reference
+
 ---
 
 The following proto message describes the schema of basic auth filter configuration.
@@ -104,10 +79,13 @@ message BasicAuth {
 ```
 
 ## Feature Request and Customization
+
 ---
 
 If you have any feature request or bug report, please open an issue in this repo. Currently it is on the roadmap to:
-- [ ] Read secret from local file. This is pending on Wasm ABI supporting file read.
-- [ ] Add regex to path matching
 
-It is recommended to customize the extension according to your needs. Please take a look at [Wasm extension C++ development guide](../doc/write-a-wasm-extension-with-cpp.md) for more information about how to write your own extension.
+* [ ] Read secret from local file. This is pending on Wasm ABI supporting file read.
+* [ ] Add regex to path matching
+
+It is recommended to customize the extension according to your needs.
+Please take a look at [Wasm extension C++ development guide](../doc/write-a-wasm-extension-with-cpp.md) for more information about how to write your own extension.

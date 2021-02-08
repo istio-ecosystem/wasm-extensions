@@ -10,8 +10,8 @@ Create a folder for the extension code. Under the folder, craete a `WORKSPACE` f
 
 ```python
 # Pulls proxy wasm cpp SDK with a specific SHA
-PROXY_WASM_CPP_SDK_SHA = "f5ecda129d1e45de36cb7898641ac225a50ce7f0"
-PROXY_WASM_CPP_SDK_SHA256 = "0f675ef5c4f8fdcf2fce8152868c6c6fd33251a0deb4a8fc1ef721f9ed387dbc"
+PROXY_WASM_CPP_SDK_SHA = "956f0d500c380cc1656a2d861b7ee12c2515a664"
+PROXY_WASM_CPP_SDK_SHA256 = "b97e3e716b1f38dc601487aa0bde72490bbc82b8f3ad73f1f3e69733984955df"
 
 http_archive(
     name = "proxy_wasm_cpp_sdk",
@@ -85,13 +85,10 @@ An unit test example could be found under the [basic auth plugin](../extensions/
 ## Step 6: Push and deploy the extension
 ---
 
-After the extension has been verified and tested, it is time to deploy the extension with Istio! Assume you have already deployed a [httpbin example app](https://github.com/istio/istio/tree/master/samples/httpbin) in your cluster, and the extension has been pushed to a blob serving service. We will use `Google Cloud Storage` as example.
+After the extension has been verified and tested, it is time to deploy the extension with Istio! An example `EnvoyFilter` configuration can be found [here](../example/config/example-filter.yaml), which applies the filter at inbound sidecar. After applying the config, `x-custom-foo` should be added into the response.
 
-First step is to apply an [EnvoyFilter](../example/config/storage-cluster.yaml) to register the blob service cluster which will be used for Wasm module downloading. Then apply the following [EnvoyFilter](../example/config/example-filter.yaml) to inject the extension to the inbound sidecar listeners, which fetches and loads the example Wasm module.
-
-Now curl the `httpbin` service, and `x-custom-foo` should be added into the response!
-```
-$ curl -I 34.123.215.139
+```console
+$ curl -I {GATEWAY_URL}
 HTTP/1.1 200 OK
 server: istio-envoy
 ...
@@ -102,6 +99,7 @@ x-wasm-custom: foo
 ---
 
 After writing, testing, and deploying the extension successfully, it is time to make sure that your extension could evolve along with Istio. Currently it is recommended to build and deploy your extension following Istio releases. Specifically:
+
 * Import all toolchain and deps to import with the same SHA as Istio releases.
 * Cut release branch as Istio, and run integration test with proxy of the same version before deploying it.
 * Version your Wasm extension module files as well as the `EnvoyFilter` configuration according to Istio version. During Istio upgrade, it will be necessary to have two `EnvoyFilters` simultaneously availble in the cluster.

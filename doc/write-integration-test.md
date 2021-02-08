@@ -71,7 +71,7 @@ In the following two steps download Envoy with a given version, take a bootstrap
     ...
     &driver.Envoy{
         Bootstrap:       params.FillTestData(string(testdata.MustAsset("bootstrap/server.yaml.tmpl"))),
-        DownloadVersion: "1.8",
+        DownloadVersion: "1.9",
     },
     &driver.Sleep{Duration: 1 * time.Second},
     ...
