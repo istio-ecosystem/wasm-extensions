@@ -27,17 +27,19 @@ static RegisterContextFactory register_BasicAuth(
 namespace {
 
 void deniedNoBasicAuthData(const std::string& realm) {
-  sendLocalResponse(401,
-                    "Request denied by Basic Auth check. No Basic "
-                    "Authentication information found.",
-                    "", {{"WWW-Authenticate", absl::StrCat("Basic realm=", realm)}});
+  sendLocalResponse(
+      401,
+      "Request denied by Basic Auth check. No Basic "
+      "Authentication information found.",
+      "", {{"WWW-Authenticate", absl::StrCat("Basic realm=", realm)}});
 }
 
 void deniedInvalidCredentials(const std::string& realm) {
-  sendLocalResponse(401,
-                    "Request denied by Basic Auth check. Invalid "
-                    "username and/or password",
-                    "", {{"WWW-Authenticate", absl::StrCat("Basic realm=", realm)}});
+  sendLocalResponse(
+      401,
+      "Request denied by Basic Auth check. Invalid "
+      "username and/or password",
+      "", {{"WWW-Authenticate", absl::StrCat("Basic realm=", realm)}});
 }
 
 bool extractBasicAuthRule(
@@ -230,10 +232,10 @@ bool PluginRootContext::configure(size_t configuration_size) {
   auto it = j.find("realm");
   if (it != j.end()) {
     auto realm_string = JsonValueAs<std::string>(it.value());
-    if (realm_string.second !=
-                Wasm::Common::JsonParserResultDetail::OK) {
-      LOG_WARN(absl::StrCat("cannot parse realm in plugin configuration JSON string: ",
-                          configuration_data->view()));
+    if (realm_string.second != Wasm::Common::JsonParserResultDetail::OK) {
+      LOG_WARN(absl::StrCat(
+          "cannot parse realm in plugin configuration JSON string: ",
+          configuration_data->view()));
       return false;
     }
     realm_ = realm_string.first.value();
