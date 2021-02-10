@@ -11,7 +11,9 @@ spec:
       listener:
         filterChain:
           filter:
-            name: envoy.http_connection_manager
+            name: envoy.
+      proxy:
+        proxyVersion: ^1\.9.*
     patch:
       operation: INSERT_BEFORE
       value:

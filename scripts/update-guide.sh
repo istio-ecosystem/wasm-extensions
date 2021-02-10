@@ -15,6 +15,14 @@ function usage() {
   exit 1
 }
 
+function semverParseInto() {
+    local RE='[^0-9]*\([0-9]*\)[.]\([0-9]*\)[.]\([0-9]*\)\([0-9A-Za-z-]*\)'
+    #MAJOR
+    eval $2=`echo $1 | sed -e "s#$RE#\1#"`
+    #MINOR
+    eval $3=`echo $1 | sed -e "s#$RE#\2#"`
+}
+
 RELEASE=""
 
 while getopts r: arg ; do
@@ -34,11 +42,7 @@ ENVOY_TMP_DIR=$(mktemp -d -t envoy-XXXXXXXXXX)
 trap "rm -rf ${ENVOY_TMP_DIR}" EXIT
 
 pushd ${ENVOY_TMP_DIR}
-if [[ ${RELEASE} == "master" ]]; then
-  git clone --depth=1 --branch master https://github.com/envoyproxy/envoy
-else
-  git clone --depth=1 --branch release-${RELEASE} https://github.com/istio/envoy
-fi
+git clone --depth=1 --branch release-${RELEASE} https://github.com/istio/envoy
 cd envoy
 
 NEW_SDK_SHA=$(bazel query //external:proxy_wasm_cpp_sdk --output=build | grep -Pom1 "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/\K[a-zA-Z0-9]{40}")
@@ -59,12 +63,14 @@ sed -e "s|uri: .*|uri: ${EXAMPLE_WASM_MODULE_URL}|" -i example/config/example-fi
 sed -e "s|sha256: .*|sha256: ${EXAMPLE_MODULE_CHECKSUM}|" -i example/config/example-filter.yaml
 rm -rf ${RELEASE}.0.wasm
 
+semverParseInto ${RELEASE}.0 MAJOR MINOR PATCH
 # Update basic auth config with wasm file of the new version.
 BASIC_AUTH_WASM_MODULE_URL="https://github.com/istio-ecosystem/wasm-extensions/releases/download/${RELEASE}.0/basic-auth.wasm"
 BASIC_AUTH_MODULE_CHECKSUM=$(wget ${BASIC_AUTH_WASM_MODULE_URL} && sha256sum basic-auth.wasm | cut -d' ' -f 1)
 trap "rm -rf basic-auth.wasm" EXIT
 sed -e "s|uri: .*|uri: ${BASIC_AUTH_WASM_MODULE_URL}|" -i extensions/basic_auth/config/gateway-filter.yaml
 sed -e "s|sha256: .*|sha256: ${BASIC_AUTH_MODULE_CHECKSUM}|" -i extensions/basic_auth/config/gateway-filter.yaml
+sed -e "s|proxyVersion: .*|proxyVersion: ^${MAJOR}\\\.${MINOR}.*|" -i extensions/basic_auth/config/gateway-filter.yaml
 rm -rf basic-auth.wasm
 
 # Update guide doc
