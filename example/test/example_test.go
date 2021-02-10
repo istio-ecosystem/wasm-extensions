@@ -18,14 +18,14 @@ func TestExamplePlugin(t *testing.T) {
 	}, test.ExtensionE2ETests)
 	params.Vars["ServerHTTPFilters"] = params.LoadTestData("test/testdata/server_filter.yaml.tmpl")
 	if err := (&driver.Scenario{
-		[]driver.Step{
+		Steps: []driver.Step{
 			&driver.XDS{},
 			&driver.Update{
 				Node: "server", Version: "0", Listeners: []string{string(testdata.MustAsset("listener/server.yaml.tmpl"))},
 			},
 			&driver.Envoy{
 				Bootstrap:       params.FillTestData(string(testdata.MustAsset("bootstrap/server.yaml.tmpl"))),
-				DownloadVersion: "1.8",
+				DownloadVersion: "1.9",
 			},
 			&driver.Sleep{Duration: 1 * time.Second},
 			&driver.HTTPCall{

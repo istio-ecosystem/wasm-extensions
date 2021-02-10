@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: basic-auth-filter
+  name: basic-auth
   namespace: istio-system
 spec:
   configPatches:
@@ -13,11 +13,31 @@ spec:
           filter:
             name: envoy.http_connection_manager
       proxy:
-        proxyVersion: ^1\.8.*
+        proxyVersion: ^1\.9.*
     patch:
       operation: INSERT_BEFORE
       value:
-        name: example-filter
+        name: istio.basic_auth
+        config_discovery:
+          config_source:
+            ads: {}
+            initial_fetch_timeout: 0s # wait indefinitely to prevent bad Wasm fetch
+          type_urls: [ "type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm"]
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: basic-auth-config
+  namespace: istio-system
+spec:
+  configPatches:
+  - applyTo: EXTENSION_CONFIG
+    match:
+      context: GATEWAY
+    patch:
+      operation: ADD
+      value:
+        name: istio.basic_auth
         typed_config:
           '@type': type.googleapis.com/udpa.type.v1.TypedStruct
           type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
@@ -29,13 +49,9 @@ spec:
                   {
                     "basic_auth_rules": [
                       {
-                        "prefix": "/",
-                        "request_methods": ["GET", "POST"],
-                        "credentials": [
-                          "ok:test",
-                          "admin:admin",
-                          "admin2:admin2"
-                        ]
+                        "prefix": "/productpage",
+                        "request_methods":[ "GET", "POST" ],
+                        "credentials":[ "ok:test", "YWRtaW4zOmFkbWluMw==" ]
                       }
                     ]
                   }
@@ -44,13 +60,10 @@ spec:
                 code:
                   remote:
                     http_uri:
-                      uri: https://storage.googleapis.com/istio-ecosystem/wasm-extensions/basic-auth/1.8.0.wasm
-                      cluster: google-storage
-                      timeout: 10s
-                    sha256: 707e29db817f76c974d7ce1fe2f61ad64c88856c7ddba99a36fe95439bfe1281
-                    retry_policy:
-                      num_retries: 5
-                      retry_back_off:
-                        base_interval: 1s
-                        max_interval: 3s
+                      uri: https://github.com/istio-ecosystem/wasm-extensions/releases/download/1.9.0/basic-auth.wasm
+                    # Optional: specifying checksum will let istio agent
+                    # verify the checksum of download artifacts. Missing
+                    # checksum will cause the Wasm module to be downloaded
+                    # repeatedly
+                    sha256: 6b0cecad751940eeedd68de5b9bcf940d0aac8bfc5f61c18d71985ee9460ee77
                 runtime: envoy.wasm.runtime.v8

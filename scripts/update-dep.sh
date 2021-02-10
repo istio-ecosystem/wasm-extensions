@@ -72,6 +72,7 @@ cd proxy
 
 NEW_PROXY_SHA=$(git rev-parse HEAD)
 NEW_PROXY_SHA256=$(wget https://github.com/istio/proxy/archive/${NEW_PROXY_SHA}.tar.gz && sha256sum ${NEW_PROXY_SHA}.tar.gz | grep -Pom1 "\K[a-zA-Z0-9]{64}")
+trap "rm -rf ${NEW_PROXY_SHA}.tar.gz" EXIT
 pushd $WD
 CUR_PROXY_SHA=$(bazel query //external:io_istio_proxy --output=build | grep -Pom1 "https://github.com/istio/proxy/archive/\K[a-zA-Z0-9]{40}")
 CUR_PROXY_SHA256=$(bazel query //external:io_istio_proxy --output=build | grep -Pom1 "sha256 = \"\K[a-zA-Z0-9]{64}")
