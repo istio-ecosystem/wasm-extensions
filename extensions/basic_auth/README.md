@@ -49,6 +49,10 @@ The following proto message describes the schema of basic auth filter configurat
 message PluginConfig {
   // Specifies a list of basic auth rules
   repeated BasicAuth basic_auth_rules = 1;
+
+  // Protection space of basic auth: https://tools.ietf.org/html/rfc7617#section-2.
+  // If not provided, the default value is `istio`.
+  string realm = 2;
 }
 
 // BasicAuth defines restriction rules based on three elements.
