@@ -23,5 +23,10 @@
                   "request_methods":[ "GET", "POST" ],
                   "credentials":[ "admin:admin", "admin2:admin2", "ok:test", "YWRtaW4zOmFkbWluMw==" ] 
                 }
-              ]
+              ],
+              {{- if .Vars.Realm }}
+              "realm": "{{ .Vars.Realm }}"
+              {{- else }}
+              "realm": "istio"
+              {{- end }}
             }

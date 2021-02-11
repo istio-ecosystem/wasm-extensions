@@ -26,18 +26,20 @@ static RegisterContextFactory register_BasicAuth(
 
 namespace {
 
-void deniedNoBasicAuthData() {
-  sendLocalResponse(401,
-                    "Request denied by Basic Auth check. No Basic "
-                    "Authentication information found.",
-                    "", {});
+void deniedNoBasicAuthData(const std::string& realm) {
+  sendLocalResponse(
+      401,
+      "Request denied by Basic Auth check. No Basic "
+      "Authentication information found.",
+      "", {{"WWW-Authenticate", absl::StrCat("Basic realm=", realm)}});
 }
 
-void deniedInvalidCredentials() {
-  sendLocalResponse(401,
-                    "Request denied by Basic Auth check. Invalid "
-                    "username and/or password",
-                    "", {});
+void deniedInvalidCredentials(const std::string& realm) {
+  sendLocalResponse(
+      401,
+      "Request denied by Basic Auth check. Invalid "
+      "username and/or password",
+      "", {{"WWW-Authenticate", absl::StrCat("Basic realm=", realm)}});
 }
 
 bool extractBasicAuthRule(
@@ -179,7 +181,7 @@ FilterHeadersStatus PluginRootContext::credentialsCheck(
     std::string_view authorization_header) {
   // Check if the Basic auth header starts with "Basic "
   if (!absl::StartsWith(authorization_header, "Basic ")) {
-    deniedNoBasicAuthData();
+    deniedNoBasicAuthData(realm_);
     return FilterHeadersStatus::StopIteration;
   }
   std::string_view authorization_header_strip =
@@ -190,7 +192,7 @@ FilterHeadersStatus PluginRootContext::credentialsCheck(
   // Check if encoded credential is part of the encoded_credentials
   // set from our container to grant or deny access.
   if (auth_credential_iter == rule.encoded_credentials.end()) {
-    deniedInvalidCredentials();
+    deniedInvalidCredentials(realm_);
     return FilterHeadersStatus::StopIteration;
   }
 
@@ -226,6 +228,17 @@ bool PluginRootContext::configure(size_t configuration_size) {
     LOG_WARN(absl::StrCat("cannot parse plugin configuration JSON string: ",
                           configuration_data->view()));
     return false;
+  }
+  auto it = j.find("realm");
+  if (it != j.end()) {
+    auto realm_string = JsonValueAs<std::string>(it.value());
+    if (realm_string.second != Wasm::Common::JsonParserResultDetail::OK) {
+      LOG_WARN(absl::StrCat(
+          "cannot parse realm in plugin configuration JSON string: ",
+          configuration_data->view()));
+      return false;
+    }
+    realm_ = realm_string.first.value();
   }
   return true;
 }
