@@ -68,6 +68,7 @@ class PluginRootContext : public RootContext {
   std::unordered_map<std::string,
                      std::vector<PluginRootContext::BasicAuthConfigRule>>
       basic_auth_configuration_;
+  std::string realm_ = "istio";
   FilterHeadersStatus credentialsCheck(
       const PluginRootContext::BasicAuthConfigRule&, std::string_view);
 };
