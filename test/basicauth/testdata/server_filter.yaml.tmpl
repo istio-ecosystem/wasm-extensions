@@ -13,12 +13,18 @@
           value: |
             {
               "basic_auth_rules": [
-                { 
+                {
+                  {{- if .Vars.Host }}
+                  "host": "{{ .Vars.Host }}",
+                  {{- end }}
                   "prefix": "/api",
                   "request_methods":[ "GET", "POST" ],
                   "credentials":[ "ok:test", "admin:admin", "admin2:admin2", "YWRtaW4zOmFkbWluMw==" ] 
                 },
-                { 
+                {
+                  {{- if .Vars.Host }}
+                  "host": "{{ .Vars.Host }}",
+                  {{- end }}
                   "exact": "/api",
                   "request_methods":[ "GET", "POST" ],
                   "credentials":[ "admin:admin", "admin2:admin2", "ok:test", "YWRtaW4zOmFkbWluMw==" ] 

@@ -40,6 +40,7 @@ class PluginRootContext : public RootContext {
   struct BasicAuthConfigRule {
     std::string request_path;
     MATCH_TYPE pattern;
+    std::string host;
     std::unordered_set<std::string> encoded_credentials;
   };
 

@@ -108,6 +108,18 @@ bool extractBasicAuthRule(
     return false;
   }
 
+  // Get the host that this rule applies on.
+  it = configuration.find("host");
+  if (it != configuration.end()) {
+    auto parse_result = JsonValueAs<std::string>(it.value());
+    if (parse_result.second != Wasm::Common::JsonParserResultDetail::OK ||
+        !parse_result.first.has_value()) {
+      LOG_WARN("failed to parse 'host' field in filter configuration.");
+      return false;
+    }
+    rule.host = parse_result.first.value();
+  }
+
   // iterate over methods that rule should be applied on.
   if (!JsonArrayIterate(
           configuration, "request_methods", [&](const json& method) -> bool {
@@ -244,30 +256,37 @@ bool PluginRootContext::configure(size_t configuration_size) {
 }
 
 FilterHeadersStatus PluginRootContext::check() {
-  auto request_path_header = getRequestHeader(":path");
-  std::string_view request_path = request_path_header->view();
   auto method = getRequestHeader(":method")->toString();
   auto method_iter = basic_auth_configuration_.find(method);
   // First we check if the request method is present in our container
   if (method_iter != basic_auth_configuration_.end()) {
+    auto request_host_header = getRequestHeader(":authority");
+    std::string_view request_host = request_host_header->view();
+    auto request_path_header = getRequestHeader(":path");
+    std::string_view request_path = request_path_header->view();
+    LOG_WARN(absl::StrCat("bianpengyuan ", request_host));
     // We iterate through our vector of struct in order to find if the
     // request_path according to given match pattern, is part of the plugin's
     // configuration data. If that's the case we check the credentials
     FilterHeadersStatus header_status = FilterHeadersStatus::Continue;
     auto authorization_header = getRequestHeader("authorization");
     std::string_view authorization = authorization_header->view();
-    for (auto& rules : basic_auth_configuration_[method]) {
-      if (rules.pattern == MATCH_TYPE::Prefix) {
-        if (absl::StartsWith(request_path, rules.request_path)) {
-          header_status = credentialsCheck(rules, authorization);
+    for (auto& rule : basic_auth_configuration_[method]) {
+      LOG_WARN(absl::StrCat("bianpengyuan2 ", rule.host));
+      if (!rule.host.empty() && rule.host != request_host) {
+        continue;
+      }
+      if (rule.pattern == MATCH_TYPE::Prefix) {
+        if (absl::StartsWith(request_path, rule.request_path)) {
+          header_status = credentialsCheck(rule, authorization);
         }
-      } else if (rules.pattern == MATCH_TYPE::Exact) {
-        if (rules.request_path == request_path) {
-          header_status = credentialsCheck(rules, authorization);
+      } else if (rule.pattern == MATCH_TYPE::Exact) {
+        if (rule.request_path == request_path) {
+          header_status = credentialsCheck(rule, authorization);
         }
-      } else if (rules.pattern == MATCH_TYPE::Suffix) {
-        if (absl::EndsWith(request_path, rules.request_path)) {
-          header_status = credentialsCheck(rules, authorization);
+      } else if (rule.pattern == MATCH_TYPE::Suffix) {
+        if (absl::EndsWith(request_path, rule.request_path)) {
+          header_status = credentialsCheck(rule, authorization);
         }
       }
       if (header_status == FilterHeadersStatus::StopIteration) {
