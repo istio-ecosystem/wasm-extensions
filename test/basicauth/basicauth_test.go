@@ -1,6 +1,7 @@
 package basicauth
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -122,7 +123,7 @@ func TestBasicAuth(t *testing.T) {
 					},
 					&driver.Envoy{
 						Bootstrap:       params.FillTestData(string(testdata.MustAsset("bootstrap/server.yaml.tmpl"))),
-						DownloadVersion: "master",
+						DownloadVersion: os.Getenv("ISTIO_TEST_VERSION"),
 					},
 					&driver.Sleep{Duration: 1 * time.Second},
 					&driver.HTTPCall{

@@ -264,7 +264,6 @@ FilterHeadersStatus PluginRootContext::check() {
     std::string_view request_host = request_host_header->view();
     auto request_path_header = getRequestHeader(":path");
     std::string_view request_path = request_path_header->view();
-    LOG_WARN(absl::StrCat("bianpengyuan ", request_host));
     // We iterate through our vector of struct in order to find if the
     // request_path according to given match pattern, is part of the plugin's
     // configuration data. If that's the case we check the credentials
@@ -272,7 +271,6 @@ FilterHeadersStatus PluginRootContext::check() {
     auto authorization_header = getRequestHeader("authorization");
     std::string_view authorization = authorization_header->view();
     for (auto& rule : basic_auth_configuration_[method]) {
-      LOG_WARN(absl::StrCat("bianpengyuan2 ", rule.host));
       if (!rule.host.empty() && rule.host != request_host) {
         continue;
       }
