@@ -16,6 +16,7 @@ import (
 var TestCases = []struct {
 	Name            string
 	Method          string
+	Host            string
 	Path            string
 	Realm           string
 	RequestHeaders  map[string]string
@@ -81,6 +82,38 @@ var TestCases = []struct {
 		ResponseHeaders: map[string]string{"WWW-Authenticate": "Basic realm=test"},
 		ResponseCode:    401,
 	},
+	{
+		Name:            "HostMismatch",
+		Method:          "POST",
+		Path:            "/api/reviews/pay",
+		Host:            "\"127.0.0.2\", \"random\"",
+		ResponseHeaders: map[string]string{},
+		ResponseCode:    200,
+	},
+	{
+		Name:            "HostExactMatch",
+		Method:          "POST",
+		Path:            "/api/reviews/pay",
+		Host:            "\"random\", \"127.0.0.1\"",
+		ResponseHeaders: map[string]string{},
+		ResponseCode:    401,
+	},
+	{
+		Name:            "HostPrefixMatch",
+		Method:          "POST",
+		Path:            "/api/reviews/pay",
+		Host:            "\"random\", \"127.0.0*\"",
+		ResponseHeaders: map[string]string{},
+		ResponseCode:    401,
+	},
+	{
+		Name:            "HostSuffixMatch",
+		Method:          "POST",
+		Path:            "/api/reviews/pay",
+		Host:            "\"random\", \"*.0.0.1\"",
+		ResponseHeaders: map[string]string{},
+		ResponseCode:    401,
+	},
 }
 
 func TestBasicAuth(t *testing.T) {
@@ -91,6 +124,9 @@ func TestBasicAuth(t *testing.T) {
 			}, test.ExtensionE2ETests)
 			if testCase.Realm != "" {
 				params.Vars["Realm"] = testCase.Realm
+			}
+			if testCase.Host != "" {
+				params.Vars["Host"] = testCase.Host
 			}
 			params.Vars["ServerHTTPFilters"] = params.LoadTestData("test/basicauth/testdata/server_filter.yaml.tmpl")
 			if err := (&driver.Scenario{
