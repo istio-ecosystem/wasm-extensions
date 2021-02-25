@@ -323,14 +323,14 @@ bool PluginRootContext::configure(size_t configuration_size) {
 }
 
 FilterHeadersStatus PluginRootContext::check() {
+  auto request_path_header = getRequestHeader(":path");
+  auto request_path = request_path_header->view();
   auto method = getRequestHeader(":method")->toString();
   auto method_iter = basic_auth_configuration_.find(method);
   // First we check if the request method is present in our container
   if (method_iter != basic_auth_configuration_.end()) {
     auto request_host_header = getRequestHeader(":authority");
     auto request_host = request_host_header->view();
-    auto request_path_header = getRequestHeader(":path");
-    auto request_path = request_path_header->view();
     // We iterate through our vector of struct in order to find if the
     // request_path according to given match pattern, is part of the plugin's
     // configuration data. If that's the case we check the credentials
