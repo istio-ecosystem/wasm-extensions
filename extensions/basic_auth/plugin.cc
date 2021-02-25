@@ -226,9 +226,7 @@ bool hostMatch(const PluginRootContext::BasicAuthConfigRule& rule,
     }
   }
 
-  LOG_WARN(absl::StrCat("bianpengyuan request host ", request_host));
   for (const auto& host_match : rule.hosts) {
-    LOG_WARN(absl::StrCat("bianpengyuan rule host ", host_match.second));
     switch (host_match.first) {
       case PluginRootContext::MATCH_TYPE::Suffix:
         if (absl::EndsWith(request_host, host_match.second)) {
