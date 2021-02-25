@@ -39,7 +39,8 @@ class PluginRootContext : public RootContext {
   enum MATCH_TYPE { Prefix, Exact, Suffix };
   struct BasicAuthConfigRule {
     std::string request_path;
-    MATCH_TYPE pattern;
+    MATCH_TYPE path_pattern;
+    std::vector<std::pair<MATCH_TYPE, std::string>> hosts;
     std::unordered_set<std::string> encoded_credentials;
   };
 
