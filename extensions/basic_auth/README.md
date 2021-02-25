@@ -63,9 +63,10 @@ message BasicAuth {
   //   Suffix domain wildcards: *.foo.com or *-bar.foo.com.
   //   Prefix domain wildcards: foo.* or foo-*.
   //
+  // If host is not provided, all hosts will be matched. A rule will
+  // be applied as long as there is one host in the list that matches.
   // Port will be stripped from the request host when comparing with
   // the host configured here.
-  // If host is not provided, all hosts will be matched.
   repeated string hosts = 1;
 
   // HTTP path to restrict access according to match pattern specification.
