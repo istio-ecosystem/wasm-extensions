@@ -86,24 +86,35 @@ message PluginConfig {
 
 // BasicAuth defines restriction rules based on three elements.
 message BasicAuth {
+  // A list of hosts that this basic auth rule applies on.
+  // Wildcard hosts are supported in the suffix or prefix form.
+  // For example:
+  //   Suffix domain wildcards: *.foo.com or *-bar.foo.com.
+  //   Prefix domain wildcards: foo.* or foo-*.
+  //
+  // Rule matches when at least one host in the list matches or the
+  // host list is empty. Port will be stripped from the request host
+  // when comparing with the host configured here.
+  repeated string hosts = 1;
+
   // HTTP path to restrict access according to match pattern specification.
   oneof match_pattern {
     // match exact pattern in request_path
-    string exact = 1;
+    string exact = 2;
 
     // match prefix pattern in request_path
-    string prefix = 2;
+    string prefix = 3;
 
     // match suffix pattern in request_path
-    string suffix = 3;
+    string suffix = 4;
   }
 
   // HTTP request method operations such as GET, POST, HEAD, PUT, and DELETE.
-  repeated string request_methods = 4;
+  repeated string request_methods = 5;
 
   // Credentials provided in the form username:password that have access.
   // Credential could be provided in two formats: `USERNAME:PASSWD` and base64 encoded credentials.
-  repeated string credentials = 5;
+  repeated string credentials = 6;
 }
 ```
 
