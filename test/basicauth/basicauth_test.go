@@ -1,7 +1,6 @@
 package basicauth
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -83,22 +82,36 @@ var TestCases = []struct {
 		ResponseCode:    401,
 	},
 	{
-		Name:            "HostMatch",
-		Method:          "POST",
-		Path:            "/api/reviews/pay",
-		Realm:           "test",
-		Host:            "127.0.0.1:20003",
-		ResponseHeaders: map[string]string{"WWW-Authenticate": "Basic realm=test"},
-		ResponseCode:    401,
-	},
-	{
 		Name:            "HostMismatch",
 		Method:          "POST",
 		Path:            "/api/reviews/pay",
-		Realm:           "test",
-		Host:            "127.0.0.2:20003",
+		Host:            "\"127.0.0.2\", \"random\"",
 		ResponseHeaders: map[string]string{},
 		ResponseCode:    200,
+	},
+	{
+		Name:            "HostExactMatch",
+		Method:          "POST",
+		Path:            "/api/reviews/pay",
+		Host:            "\"random\", \"127.0.0.1\"",
+		ResponseHeaders: map[string]string{},
+		ResponseCode:    401,
+	},
+	{
+		Name:            "HostPrefixMatch",
+		Method:          "POST",
+		Path:            "/api/reviews/pay",
+		Host:            "\"random\", \"127.0.0*\"",
+		ResponseHeaders: map[string]string{},
+		ResponseCode:    401,
+	},
+	{
+		Name:            "HostSuffixMatch",
+		Method:          "POST",
+		Path:            "/api/reviews/pay",
+		Host:            "\"random\", \"*.0.0.1\"",
+		ResponseHeaders: map[string]string{},
+		ResponseCode:    401,
 	},
 }
 
@@ -123,7 +136,7 @@ func TestBasicAuth(t *testing.T) {
 					},
 					&driver.Envoy{
 						Bootstrap:       params.FillTestData(string(testdata.MustAsset("bootstrap/server.yaml.tmpl"))),
-						DownloadVersion: os.Getenv("ISTIO_TEST_VERSION"),
+						DownloadVersion: "master",
 					},
 					&driver.Sleep{Duration: 1 * time.Second},
 					&driver.HTTPCall{

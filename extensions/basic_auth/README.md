@@ -57,9 +57,16 @@ message PluginConfig {
 
 // BasicAuth defines restriction rules based on three elements.
 message BasicAuth {
-  // HTTP host that this basic auth rule applies on.
-  // If host is not provided, this rule is applied to all hosts.
-  string host = 1;
+  // A list of hosts that this basic auth rule applies on.
+  // Wildcard hosts are supported in the suffix or prefix form.
+  // For example:
+  //   Suffix domain wildcards: *.foo.com or *-bar.foo.com.
+  //   Prefix domain wildcards: foo.* or foo-*.
+  //
+  // Port will be stripped from the request host when comparing with
+  // the host configured here.
+  // If host is not provided, all hosts will be matched.
+  repeated string hosts = 1;
 
   // HTTP path to restrict access according to match pattern specification.
   oneof match_pattern {

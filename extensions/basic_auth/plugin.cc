@@ -109,15 +109,32 @@ bool extractBasicAuthRule(
   }
 
   // Get the host that this rule applies on.
-  it = configuration.find("host");
-  if (it != configuration.end()) {
-    auto parse_result = JsonValueAs<std::string>(it.value());
-    if (parse_result.second != Wasm::Common::JsonParserResultDetail::OK ||
-        !parse_result.first.has_value()) {
-      LOG_WARN("failed to parse 'host' field in filter configuration.");
-      return false;
-    }
-    rule.host = parse_result.first.value();
+  if (!JsonArrayIterate(configuration, "hosts", [&](const json& host) -> bool {
+        auto parse_result = JsonValueAs<std::string>(host);
+        if (parse_result.second != Wasm::Common::JsonParserResultDetail::OK ||
+            !parse_result.first.has_value()) {
+          LOG_WARN("failed to parse 'host' field in filter configuration.");
+          return false;
+        }
+        auto& host_str = parse_result.first.value();
+        std::pair<PluginRootContext::MATCH_TYPE, std::string> host_match;
+        if (absl::StartsWith(host_str, "*")) {
+          // suffix match
+          host_match.first = PluginRootContext::MATCH_TYPE::Suffix;
+          host_match.second = host_str.substr(1);
+        } else if (absl::EndsWith(host_str, "*")) {
+          // prefix match
+          host_match.first = PluginRootContext::MATCH_TYPE::Prefix;
+          host_match.second = host_str.substr(0, host_str.size() - 1);
+        } else {
+          host_match.first = PluginRootContext::MATCH_TYPE::Exact;
+          host_match.second = host_str;
+        }
+        rule.hosts.push_back(host_match);
+        return true;
+      })) {
+    LOG_WARN("failed to parse configuration for request hosts.");
+    return false;
   }
 
   // iterate over methods that rule should be applied on.
@@ -171,19 +188,69 @@ bool extractBasicAuthRule(
   }
 
   if (!prefix.empty()) {
-    rule.pattern = PluginRootContext::Prefix;
+    rule.path_pattern = PluginRootContext::Prefix;
     rule.request_path = prefix;
   } else if (!exact.empty()) {
-    rule.pattern = PluginRootContext::Exact;
+    rule.path_pattern = PluginRootContext::Exact;
     rule.request_path = exact;
   } else if (!suffix.empty()) {
-    rule.pattern = PluginRootContext::Suffix;
+    rule.path_pattern = PluginRootContext::Suffix;
     rule.request_path = suffix;
   }
   for (auto& method : request_methods) {
     (*rules)[method].push_back(rule);
   }
   return true;
+}
+
+bool hostMatch(const PluginRootContext::BasicAuthConfigRule& rule,
+               std::string_view request_host) {
+  if (rule.hosts.empty()) {
+    // If no host specified, consider this rule applies to all host.
+    return true;
+  }
+
+  // Remove port, if there is any. At Istio 1.10, port will be stripped
+  // by default https://github.com/istio/istio/issues/25350.
+  // Port removing code is inspired by
+  // https://github.com/envoyproxy/envoy/blob/v1.17.0/source/common/http/header_utility.cc#L219
+  const absl::string_view::size_type port_start = request_host.rfind(':');
+  if (port_start != std::string_view::npos) {
+    // According to RFC3986 v6 address is always enclosed in "[]".
+    // section 3.2.2.
+    const auto v6_end_index = request_host.rfind("]");
+    if (v6_end_index == absl::string_view::npos || v6_end_index < port_start) {
+      if ((port_start + 1) <= request_host.size()) {
+        request_host = request_host.substr(0, port_start);
+      }
+    }
+  }
+
+  LOG_WARN(absl::StrCat("bianpengyuan request host ", request_host));
+  for (const auto& host_match : rule.hosts) {
+    LOG_WARN(absl::StrCat("bianpengyuan rule host ", host_match.second));
+    switch (host_match.first) {
+      case PluginRootContext::MATCH_TYPE::Suffix:
+        if (absl::EndsWith(request_host, host_match.second)) {
+          return true;
+        }
+        break;
+      case PluginRootContext::MATCH_TYPE::Prefix:
+        if (absl::StartsWith(request_host, host_match.second)) {
+          return true;
+        }
+        break;
+      case PluginRootContext::MATCH_TYPE::Exact:
+        if (request_host == host_match.second) {
+          return true;
+        }
+        break;
+      default:
+        LOG_WARN(absl::StrCat("unexpected host match pattern"));
+        return false;
+    }
+  }
+  return false;
 }
 
 }  // namespace
@@ -261,28 +328,28 @@ FilterHeadersStatus PluginRootContext::check() {
   // First we check if the request method is present in our container
   if (method_iter != basic_auth_configuration_.end()) {
     auto request_host_header = getRequestHeader(":authority");
-    std::string_view request_host = request_host_header->view();
+    auto request_host = request_host_header->view();
     auto request_path_header = getRequestHeader(":path");
-    std::string_view request_path = request_path_header->view();
+    auto request_path = request_path_header->view();
     // We iterate through our vector of struct in order to find if the
     // request_path according to given match pattern, is part of the plugin's
     // configuration data. If that's the case we check the credentials
     FilterHeadersStatus header_status = FilterHeadersStatus::Continue;
     auto authorization_header = getRequestHeader("authorization");
-    std::string_view authorization = authorization_header->view();
+    auto authorization = authorization_header->view();
     for (auto& rule : basic_auth_configuration_[method]) {
-      if (!rule.host.empty() && rule.host != request_host) {
+      if (!hostMatch(rule, request_host)) {
         continue;
       }
-      if (rule.pattern == MATCH_TYPE::Prefix) {
+      if (rule.path_pattern == MATCH_TYPE::Prefix) {
         if (absl::StartsWith(request_path, rule.request_path)) {
           header_status = credentialsCheck(rule, authorization);
         }
-      } else if (rule.pattern == MATCH_TYPE::Exact) {
+      } else if (rule.path_pattern == MATCH_TYPE::Exact) {
         if (rule.request_path == request_path) {
           header_status = credentialsCheck(rule, authorization);
         }
-      } else if (rule.pattern == MATCH_TYPE::Suffix) {
+      } else if (rule.path_pattern == MATCH_TYPE::Suffix) {
         if (absl::EndsWith(request_path, rule.request_path)) {
           header_status = credentialsCheck(rule, authorization);
         }

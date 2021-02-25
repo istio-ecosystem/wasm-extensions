@@ -15,7 +15,7 @@
               "basic_auth_rules": [
                 {
                   {{- if .Vars.Host }}
-                  "host": "{{ .Vars.Host }}",
+                  "hosts": [{{ .Vars.Host }}],
                   {{- end }}
                   "prefix": "/api",
                   "request_methods":[ "GET", "POST" ],
@@ -23,7 +23,7 @@
                 },
                 {
                   {{- if .Vars.Host }}
-                  "host": "{{ .Vars.Host }}",
+                  "hosts": [{{ .Vars.Host }}],
                   {{- end }}
                   "exact": "/api",
                   "request_methods":[ "GET", "POST" ],
