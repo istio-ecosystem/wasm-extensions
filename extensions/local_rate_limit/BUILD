@@ -3,10 +3,10 @@ load("@proxy_wasm_cpp_sdk//bazel/wasm:wasm.bzl", "wasm_cc_binary")
 wasm_cc_binary(
     name = "local_rate_limit.wasm",
     srcs = [
-        "plugin.cc",
-        "plugin.h",
         "bucket.cc",
         "bucket.h",
+        "plugin.cc",
+        "plugin.h",
     ],
     deps = [
         "@com_google_absl//absl/strings",
