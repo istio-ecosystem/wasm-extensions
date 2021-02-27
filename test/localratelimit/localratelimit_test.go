@@ -1,6 +1,7 @@
 package localratelimit
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -25,7 +26,7 @@ func TestLocalRateLimit(t *testing.T) {
 			},
 			&driver.Envoy{
 				Bootstrap:       params.FillTestData(string(testdata.MustAsset("bootstrap/server.yaml.tmpl"))),
-				DownloadVersion: "master",
+				DownloadVersion: os.Getenv("ISTIO_TEST_VERSION"),
 			},
 			&driver.Sleep{Duration: 3 * time.Second},
 			// Test with max token 20, per refill 10, and refill interval 1s.
