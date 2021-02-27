@@ -106,7 +106,6 @@ void refillToken(uint64_t tokens_per_refill, uint64_t refill_interval_nanosec,
     if (res != WasmResult::Ok) {
       LOG_WARN("failed to refill local rate limit token bucket");
     }
-    LOG_WARN("bianpengyuan: refill tokens!");
     break;
   }
 }
