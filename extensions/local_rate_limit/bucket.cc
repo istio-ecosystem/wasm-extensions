@@ -2,7 +2,7 @@
 
 // Key for token bucket shared data.
 constexpr char localRateLimitTokenBucket[] =
-    "wasm_ocal_rate_limit.token_bucket";
+    "wasm_local_rate_limit.token_bucket";
 
 // Key for token bucket last updated time.
 constexpr char localRateLimitLastRefilled[] =
@@ -13,7 +13,7 @@ bool getToken() {
   uint32_t cas;
   while (true) {
     // Get the current token left with cas (compare-and-swap), which will be
-    // used in set call latter.
+    // used in the set call below.
     if (WasmResult::Ok !=
         getSharedData(localRateLimitTokenBucket, &token_bucket_data, &cas)) {
       return false;
