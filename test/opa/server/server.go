@@ -2,10 +2,12 @@ package server
 
 import (
 	"fmt"
-	"go/build"
+	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
-	"runtime"
+	"path/filepath"
 
 	framework "istio.io/proxy/test/envoye2e/driver"
 )
@@ -13,6 +15,7 @@ import (
 // OpaServer models an OPA server process.
 type OpaServer struct {
 	opaProcess   *os.Process
+	tmpDir       string
 	RuleFilePath string
 }
 
@@ -24,6 +27,7 @@ func (o *OpaServer) Run(p *framework.Params) error {
 	if err != nil {
 		return err
 	}
+	o.tmpDir = filepath.Dir(opaPath)
 
 	// Run Opa Server with given rule file
 	opaServerCmd := fmt.Sprintf("%v run --server --log-level debug %v", opaPath, o.RuleFilePath)
@@ -41,30 +45,31 @@ func (o *OpaServer) Run(p *framework.Params) error {
 
 // Cleanup closes an OPA server process.
 func (o *OpaServer) Cleanup() {
+	os.Remove(o.tmpDir)
 	o.opaProcess.Kill()
 }
 
 func downloadOpaServer() (string, error) {
-	outputPath := fmt.Sprintf("%s/out/%s_%s", build.Default.GOPATH, runtime.GOOS, runtime.GOARCH)
-	dst := fmt.Sprintf("%v/opa", outputPath)
-	if _, err := os.Stat(dst); err == nil {
-		return dst, nil
-	}
+	tmpdDir, err := ioutil.TempDir("", "opa-")
+	dst := fmt.Sprintf("%s/%s", tmpdDir, "opa")
+
 	opaURL := "https://openpolicyagent.org/downloads/latest/opa_linux_amd64"
-	fmt.Printf("download opa server to %v from %v", dst, opaURL)
-	donwloadCmd := exec.Command("bash", "-c", fmt.Sprintf("curl -L -o %v %v", dst, opaURL))
-	donwloadCmd.Stderr = os.Stderr
-	donwloadCmd.Stdout = os.Stdout
-	err := donwloadCmd.Run()
+	resp, err := http.Get(opaURL)
 	if err != nil {
-		return "", fmt.Errorf("fail to run opa download command: %v", err)
+		return "", err
 	}
-	chmodCmd := exec.Command("bash", "-c", fmt.Sprintf("chmod 755 %v", dst))
-	chmodCmd.Stderr = os.Stderr
-	chmodCmd.Stdout = os.Stdout
-	err = chmodCmd.Run()
+	defer resp.Body.Close()
 	if err != nil {
-		return "", fmt.Errorf("fail to chmod for opa: %v", err)
+		return "", fmt.Errorf("fail to download opa: %v", err)
 	}
+	outFile, err := os.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return "", err
+	}
+	defer outFile.Close()
+
+	// Write the body to file
+	_, err = io.Copy(outFile, resp.Body)
+
 	return dst, nil
 }
