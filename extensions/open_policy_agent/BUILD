@@ -5,11 +5,11 @@ wasm_cc_binary(
     srcs = [
         "cache.cc",
         "cache.h",
-        "plugin.h",
         "plugin.cc",
+        "plugin.h",
     ],
     deps = [
-        "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
         "@io_istio_proxy//extensions/common/wasm:json_util",
+        "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
     ],
 )
