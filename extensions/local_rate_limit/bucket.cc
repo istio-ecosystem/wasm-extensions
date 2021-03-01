@@ -1,5 +1,11 @@
 #include "extensions/local_rate_limit/bucket.h"
 
+#include "absl/strings/str_cat.h"
+
+namespace {
+
+const int maxGetTokenRetry = 20;
+
 // Key for token bucket shared data.
 constexpr char localRateLimitTokenBucket[] =
     "wasm_local_rate_limit.token_bucket";
@@ -8,10 +14,12 @@ constexpr char localRateLimitTokenBucket[] =
 constexpr char localRateLimitLastRefilled[] =
     "wasm_local_rate_limit.last_refilled";
 
+}  // namespace
+
 bool getToken() {
   WasmDataPtr token_bucket_data;
   uint32_t cas;
-  while (true) {
+  for (int i = 0; i < maxGetTokenRetry; i++) {
     // Get the current token left with cas (compare-and-swap), which will be
     // used in the set call below.
     if (WasmResult::Ok !=
@@ -43,6 +51,10 @@ bool getToken() {
     }
     return false;
   }
+
+  // We tried to get token for more than `maxGetTokenRetry` times. Return true
+  // and let the request through.
+  return true;
 }
 
 void refillToken(uint64_t tokens_per_refill, uint64_t refill_interval_nanosec,
@@ -52,10 +64,12 @@ void refillToken(uint64_t tokens_per_refill, uint64_t refill_interval_nanosec,
   // VMs.
   uint32_t last_update_cas;
   WasmDataPtr last_update_data;
-  if (WasmResult::Ok != getSharedData(localRateLimitLastRefilled,
-                                      &last_update_data, &last_update_cas)) {
-    LOG_WARN(
-        "failed to get last update time of the local rate limit token bucket");
+  auto result = getSharedData(localRateLimitLastRefilled, &last_update_data,
+                              &last_update_cas);
+  if (result != WasmResult::Ok) {
+    LOG_DEBUG(absl::StrCat(
+        "failed to get last update time of the local rate limit token bucket ",
+        toString(result)));
     return;
   }
   uint64_t last_update =
@@ -74,7 +88,7 @@ void refillToken(uint64_t tokens_per_refill, uint64_t refill_interval_nanosec,
     return;
   }
   if (res != WasmResult::Ok) {
-    LOG_WARN("failed to set local rate limit token bucket last update time");
+    LOG_DEBUG("failed to set local rate limit token bucket last update time");
     return;
   }
 
@@ -85,7 +99,7 @@ void refillToken(uint64_t tokens_per_refill, uint64_t refill_interval_nanosec,
     // Get token left with cas.
     if (WasmResult::Ok !=
         getSharedData(localRateLimitTokenBucket, &token_bucket_data, &cas)) {
-      LOG_WARN("failed to get current local rate limit token bucket");
+      LOG_DEBUG("failed to get current local rate limit token bucket");
       break;
     }
     uint64_t token_left =
@@ -104,7 +118,7 @@ void refillToken(uint64_t tokens_per_refill, uint64_t refill_interval_nanosec,
       continue;
     }
     if (res != WasmResult::Ok) {
-      LOG_WARN("failed to refill local rate limit token bucket");
+      LOG_DEBUG("failed to refill local rate limit token bucket");
     }
     break;
   }
@@ -127,7 +141,7 @@ bool initializeTokenBucket(uint64_t initial_tokens) {
     return true;
   }
   if (res != WasmResult::Ok) {
-    LOG_WARN("failed to set local rate limit token bucket last update time");
+    LOG_DEBUG("failed to set local rate limit token bucket last update time");
     return false;
   }
 
@@ -135,7 +149,7 @@ bool initializeTokenBucket(uint64_t initial_tokens) {
                       {reinterpret_cast<const char *>(&initial_tokens),
                        sizeof(initial_tokens)});
   if (res != WasmResult::Ok) {
-    LOG_WARN("failed to initialize token bucket");
+    LOG_DEBUG("failed to initialize token bucket");
     return false;
   }
   return true;
