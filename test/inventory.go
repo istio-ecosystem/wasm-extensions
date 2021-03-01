@@ -15,6 +15,9 @@ func init() {
 			"TestBasicAuth/NoPathMatch",
 			"TestBasicAuth/NoMethodMatch",
 			"TestBasicAuth/NoConfigurationCredentialsProvided",
+			"TestOPA/allow",
+			"TestOPA/deny",
+			"TestOPA/cache_expire",
 		},
 	}
 }

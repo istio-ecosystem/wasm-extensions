@@ -10,6 +10,7 @@ This repository contains several canonical Wasm extensions, which intend to demo
 * [C++ empty scaffold](/extensions/scaffold/)
 * [Zig scaffold](/extensions/zig_demo/)
 * [Basic auth](/extensions/basic_auth/)
+* [Open Policy Agent (OPA) client](/extensions/opa/)
 
 # Guides
 

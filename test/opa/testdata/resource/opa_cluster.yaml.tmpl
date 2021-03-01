@@ -1,0 +1,12 @@
+- name: opa_policy_server
+  connect_timeout: 5s
+  type: STATIC
+  load_assignment:
+    cluster_name: opa_policy_server
+    endpoints:
+    - lb_endpoints:
+      - endpoint:
+          address:
+            socket_address:
+              address: 127.0.0.1
+              port_value: 8181
