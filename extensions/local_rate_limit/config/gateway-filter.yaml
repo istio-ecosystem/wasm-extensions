@@ -1,0 +1,58 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: local-rate-limit
+  namespace: istio-system
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        filterChain:
+          filter:
+            name: envoy.http_connection_manager
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: istio.local_rate_limit
+        config_discovery:
+          config_source:
+            ads: {}
+            initial_fetch_timeout: 0s # wait indefinitely to prevent bad Wasm fetch
+          type_urls: [ "type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm"]
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: local-rate-limit-config
+  namespace: istio-system
+spec:
+  configPatches:
+  - applyTo: EXTENSION_CONFIG
+    match:
+      context: GATEWAY
+    patch:
+      operation: ADD
+      value:
+        name: istio.local_rate_limit
+        typed_config:
+          '@type': type.googleapis.com/udpa.type.v1.TypedStruct
+          type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+          value:
+            config:
+              configuration:
+                '@type': type.googleapis.com/google.protobuf.StringValue
+                value: |
+                  {
+                    "max_tokens": 50,
+                    "tokens_per_refill": 20,
+                    "refill_interval_sec": 60
+                  }
+              vm_config:
+                vm_id: local_rate_limit
+                code:
+                  remote:
+                    http_uri:
+                      uri: https://storage.googleapis.com/istio-ecosystem/wasm-extensions/local-rate-limit/test.wasm
+                runtime: envoy.wasm.runtime.v8
