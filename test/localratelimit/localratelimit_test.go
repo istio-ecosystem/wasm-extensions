@@ -43,6 +43,7 @@ func TestLocalRateLimit(t *testing.T) {
 				Step: &driver.HTTPCall{
 					Port:         params.Ports.ServerPort,
 					ResponseCode: 429,
+					Body:         "rate_limited",
 				},
 			},
 			// Sleep 1s, and token bucket should be refilled with 10 tokens.
@@ -59,6 +60,7 @@ func TestLocalRateLimit(t *testing.T) {
 				Step: &driver.HTTPCall{
 					Port:         params.Ports.ServerPort,
 					ResponseCode: 429,
+					Body:         "rate_limited",
 				},
 			},
 		},

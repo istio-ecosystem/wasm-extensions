@@ -13,7 +13,7 @@ using ::Wasm::Common::JsonValueAs;
 namespace {
 
 // tooManyRequest returns a 429 response code.
-void tooManyRequest() { sendLocalResponse(429, "Too many requests", "", {}); }
+void tooManyRequest() { sendLocalResponse(429, "Too many requests", "rate_limited", {}); }
 
 bool shouldRateLimit() {
   /*
