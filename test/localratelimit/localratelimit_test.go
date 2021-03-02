@@ -46,8 +46,8 @@ func TestLocalRateLimit(t *testing.T) {
 					Body:         "rate_limited",
 				},
 			},
-			// Sleep 1s, and token bucket should be refilled with 10 tokens.
-			&driver.Sleep{Duration: 1 * time.Second},
+			// Sleep 1s + 500ms headroom, and token bucket should be refilled with 10 tokens.
+			&driver.Sleep{Duration: 1500 * time.Millisecond},
 			&driver.Repeat{
 				N: 10,
 				Step: &driver.HTTPCall{
