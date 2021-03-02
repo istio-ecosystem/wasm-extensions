@@ -62,6 +62,9 @@ void refillToken(uint64_t tokens_per_refill, uint64_t refill_interval_nanosec,
   // Get last refill time, if it is less than refill interval, which indicates
   // the bucket is going to be refilled or has already been refilled by other
   // VMs.
+  // TODO(bianpengyuan): simplify this by designating one VM to refill the
+  // bucket when https://github.com/proxy-wasm/proxy-wasm-cpp-host/issues/135 is
+  // done.
   uint32_t last_update_cas;
   WasmDataPtr last_update_data;
   auto result = getSharedData(localRateLimitLastRefilled, &last_update_data,
