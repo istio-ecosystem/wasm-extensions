@@ -21,6 +21,7 @@ func init() {
 			"TestBasicAuth/HostPrefixMatch",
 			"TestBasicAuth/HostSuffixMatch",
 			"TestLocalRateLimit",
+			"TestGrpcLogging",
 		},
 	}
 }
