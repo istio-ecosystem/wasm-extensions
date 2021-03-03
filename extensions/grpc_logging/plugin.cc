@@ -59,6 +59,7 @@ bool PluginRootContext::onConfigure(size_t configuration_size) {
       LOG_WARN("in flight report call should not be negative");
     }
     if (in_flight_export_call_ <= 0 && is_on_done_) {
+      // All works have been finished. The plugin is safe to be destroyed.
       proxy_done();
     }
   };
@@ -84,11 +85,15 @@ bool PluginRootContext::onConfigure(size_t configuration_size) {
 
 bool PluginRootContext::onDone() {
   if (req_buffer_.empty() && in_flight_export_call_ == 0) {
+    // returning true to signal that the plugin still has pending work to be
+    // done.
     return true;
   }
   // Flush out all log entries
   flushLogBuffer();
   sendLogRequest(/* ondone */ true);
+  // returning false to signal that the plugin has finished all the works and is
+  // safe to be destroyed.
   return false;
 }
 
@@ -109,39 +114,29 @@ void PluginRootContext::addLogEntry(PluginContext* stream) {
   // is running at a server sidecar.
 
   // Workload attributes.
-  std::string source_address, destination_address;
-  getValue({"source", "address"}, &source_address);
-  getValue({"destination", "address"}, &destination_address);
-  new_entry->set_source_address(source_address);
-  new_entry->set_destination_address(destination_address);
-
-  std::string destination_workload, destination_namespace;
-  getValue({"node", "metadata", "WORKLOAD_NAME"}, &destination_workload);
-  getValue({"node", "metadata", "NAMESPACE"}, &destination_namespace);
-  new_entry->set_destination_workload(destination_workload);
-  new_entry->set_destination_namespace(destination_namespace);
+  getValue({"source", "address"}, new_entry->mutable_source_address());
+  getValue({"destination", "address"},
+           new_entry->mutable_destination_address());
+  getValue({"node", "metadata", "WORKLOAD_NAME"},
+           new_entry->mutable_destination_workload());
+  getValue({"node", "metadata", "NAMESPACE"},
+           new_entry->mutable_destination_namespace());
 
   // Request attributes.
-  std::string path, host, request_id, referer, user_agent;
   int64_t response_code, timestamp, duration;
   getValue({"request", "time"}, &timestamp);
   getValue({"request", "duration"}, &duration);
-  getValue({"request", "id"}, &request_id);
-  getValue({"request", "host"}, &host);
-  getValue({"request", "url_path"}, &path);
+  getValue({"request", "id"}, new_entry->mutable_request_id());
+  getValue({"request", "host"}, new_entry->mutable_host());
+  getValue({"request", "url_path"}, new_entry->mutable_path());
   getValue({"response", "code"}, &response_code);
-  getValue({"request", "referer"}, &referer);
-  getValue({"request", "user_agent"}, &user_agent);
+  getValue({"request", "referer"}, new_entry->mutable_referer());
+  getValue({"request", "user_agent"}, new_entry->mutable_user_agent());
 
   *new_entry->mutable_timestamp() =
       google::protobuf::util::TimeUtil::NanosecondsToTimestamp(timestamp);
   *new_entry->mutable_latency() =
       google::protobuf::util::TimeUtil::NanosecondsToDuration(duration);
-  new_entry->set_request_id(request_id);
-  new_entry->set_path(path);
-  new_entry->set_host(host);
-  new_entry->set_user_agent(user_agent);
-  new_entry->set_referer(referer);
   new_entry->set_response_code(response_code);
 
   log_entry_count_ += 1;

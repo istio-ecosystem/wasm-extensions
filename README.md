@@ -5,7 +5,7 @@ This repository contains several canonical Wasm extensions, which intend to demo
 * Development pattern of Wasm extension.
 * Best practice to test, build, and release a Wasm extension.
 
-# Extensio
+# Extensions
 * [Basic auth](/extensions/basic_auth/)
 * [C++ scaffold](/extensions/scaffold/)
 * [gRPC access logging](./extension/grpc_loggig)
