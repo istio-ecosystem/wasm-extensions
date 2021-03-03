@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package istio_ecosystem.wasm_extensions.grpc_logging;
+
+message PluginConfig {
+  // logging service address.
+  string logging_service = 1;
+}

@@ -24,6 +24,7 @@ func init() {
 			"TestOPA/allow",
 			"TestOPA/deny",
 			"TestOPA/cache_expire",
+			"TestGrpcLogging",
 		},
 	}
 }

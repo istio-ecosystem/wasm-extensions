@@ -6,9 +6,9 @@ This repository contains several canonical Wasm extensions, which intend to demo
 * Best practice to test, build, and release a Wasm extension.
 
 # Extensions
-
 * [Basic auth](/extensions/basic_auth/)
-* [Empty C++ scaffold](/extensions/scaffold/)
+* [C++ scaffold](/extensions/scaffold/)
+* [gRPC access logging](./extension/grpc_loggig)
 * [Local rate limit](/extensions/local_rate_limit/)
 * [Open Policy Agent (OPA) client](/extensions/opa/)
 * [Zig scaffold](/extensions/zig_demo/)
