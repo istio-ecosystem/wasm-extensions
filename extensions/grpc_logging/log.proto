@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package istio_ecosystem.wasm_extensions.grpc_logging;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+service LoggingService {
+  rpc WriteLog(WriteLogRequest) returns (WriteLogResponse);
+}
+
+message WriteLogRequest {
+  message LogEntry {
+    string source_address = 1;
+    string destination_address = 2;
+    string destination_workload = 3;
+    string destination_namespace = 4;
+    string host = 5;
+    string path = 6;
+    string user_agent = 7;
+    string referer = 8;
+    string request_id = 9;
+    uint32 response_code = 12;
+    google.protobuf.Timestamp timestamp = 10;
+    google.protobuf.Duration latency = 11;
+  }
+
+  repeated LogEntry log_entries = 1;
+}
+
+message WriteLogResponse {}

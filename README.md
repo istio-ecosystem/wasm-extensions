@@ -5,12 +5,12 @@ This repository contains several canonical Wasm extensions, which intend to demo
 * Development pattern of Wasm extension.
 * Best practice to test, build, and release a Wasm extension.
 
-# Extensions
-
-* [C++ empty scaffold](/extensions/scaffold/)
-* [Zig scaffold](/extensions/zig_demo/)
+# Extensio
 * [Basic auth](/extensions/basic_auth/)
+* [C++ scaffold](/extensions/scaffold/)
+* [gRPC access logging](./extension/grpc_loggig)
 * [Local rate limit](/extensions/local_rate_limit/)
+* [Zig scaffold](/extensions/zig_demo/)
 
 # Guides
 
