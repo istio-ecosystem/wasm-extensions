@@ -9,8 +9,8 @@ wasm_cc_binary(
     deps = [
         ":config_cc_proto",
         ":log_cc_proto",
-        "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics_lite",
         "@com_google_absl//absl/strings",
+        "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics_lite",
     ],
 )
 
