@@ -21,10 +21,10 @@ func init() {
 			"TestBasicAuth/HostPrefixMatch",
 			"TestBasicAuth/HostSuffixMatch",
 			"TestLocalRateLimit",
+			"TestGrpcLogging",
 			"TestOPA/allow",
 			"TestOPA/deny",
 			"TestOPA/cache_expire",
-			"TestGrpcLogging",
 		},
 	}
 }
