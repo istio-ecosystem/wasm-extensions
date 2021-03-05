@@ -13,7 +13,7 @@ This repository contains several canonical Wasm extensions, which intend to demo
   
 * *[C++ scaffold](/extensions/scaffold/)* provides an empty C++ extension, which can be used as a start point to write a C++ Wasm extension.
   
-* *[gRPC access logging](./extension/grpc_loggig)* makes a logging request to a gRPC service with various kinds of request and workload attributes. From this extension, you can find how to perform asynchronous telemetry reporting, fetch various request attributes and proxy properties, use protobuf and make gRPC callout.
+* *[gRPC access logging](./extensions/grpc_loggig)* makes a logging request to a gRPC service with various kinds of request and workload attributes. From this extension, you can find how to perform asynchronous telemetry reporting, fetch various request attributes and proxy properties, use protobuf and make gRPC callout.
 
 * *JWT based routing ([WIP](https://github.com/istio-ecosystem/wasm-extensions/issues/16))* reads JWT token information from Envoy dynamic metadata written by JWT auth filter, update host header accordingly, and trigger routing recomputation. From this extension, you can find how to read dynamic metadata, manipulate headers, and affect request routing.
 
