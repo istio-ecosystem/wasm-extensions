@@ -19,7 +19,7 @@ This repository contains several canonical Wasm extensions, which intend to demo
 
 * *[Local rate limit](/extensions/local_rate_limit/)* applies a token bucket rate limit to incoming requests. Each request processed by the filter utilizes a single token, and if no tokens are available, the request will be denied. From this extension you can find how to share data across all plugin VMs and deny request with local reply.
 
-* *Open Policy Agent client ([WIP](https://github.com/istio-ecosystem/wasm-extensions/pull/54))* makes HTTP callout to a Open Policy Agent (OPA) server and based on OPA server response make decision to allow or deny an incoming request. A result cache is also included to avoid expensive callout on every request. From this extension, you can find how to perform HTTP callout, and asynchronously continue or stop the request based on the response of HTTP call. You will also find how to record stats, which can be scraped in the same way as Istio standard metrics.
+* *Open Policy Agent client ([WIP](https://github.com/istio-ecosystem/wasm-extensions/pull/54))* makes HTTP callout to a Open Policy Agent (OPA) server and based on OPA server response make decision to allow or deny an incoming request. A result cache is also included to avoid expensive callout on every request. From this extension, you can find how to perform HTTP callout, and asynchronously continue or stop an incoming request based on the response of HTTP call. You will also find how to record stats, which can be scraped in the same way as Istio standard metrics.
 
 * *[Zig scaffold](/extensions/zig_demo/)* provides an empty [Zig](https://ziglang.org/) extension, which can be used as a start point to write a Zig Wasm extension.
 
