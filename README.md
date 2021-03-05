@@ -15,7 +15,7 @@ This repository contains several canonical Wasm extensions, which intend to demo
   
 * *[gRPC access logging](./extension/grpc_loggig)* makes a logging request to a gRPC service with various kinds of request and workload attributes. From this extension, you can find how to perform asynchronous telemetry reporting, fetch various request attributes and proxy properties, use protobuf and make gRPC callout.
 
-* *JWT based routing ([WIP](https://github.com/istio-ecosystem/wasm-extensions/issues/16))* reads JWT token information from Envoy dynamic metadata written by JWT auth filter, update host header accordingly and trigger routing recomputation. From this extension, you can find how to read dynamic metadata, manipulate headers, and affecting routes.
+* *JWT based routing ([WIP](https://github.com/istio-ecosystem/wasm-extensions/issues/16))* reads JWT token information from Envoy dynamic metadata written by JWT auth filter, update host header accordingly, and trigger routing recomputation. From this extension, you can find how to read dynamic metadata, manipulate headers, and affect request routing.
 
 * *[Local rate limit](/extensions/local_rate_limit/)* applies a token bucket rate limit to incoming requests. Each request processed by the filter utilizes a single token, and if no tokens are available, the request will be denied. From this extension you can find how to share data across all plugin VMs and deny request with local reply.
 
