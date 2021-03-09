@@ -1,0 +1,19 @@
+- name: envoy.filters.http.wasm
+  typed_config:
+    "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+    type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+    value:
+      config:
+        vm_config:
+          vm_id: "opa_vm"
+          runtime: "envoy.wasm.runtime.v8"
+          code:
+            local: { filename: {{ .Vars.OpaPluginFilePath }} }
+        configuration:
+          "@type": "type.googleapis.com/google.protobuf.StringValue"
+          value: |
+            {
+              "opa_cluster_name": "opa_policy_server",
+              "opa_service_host": "localhost:8181",
+              "check_result_cache_valid_sec": 10
+            }

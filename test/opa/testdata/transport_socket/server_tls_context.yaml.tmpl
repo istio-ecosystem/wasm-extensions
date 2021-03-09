@@ -1,0 +1,13 @@
+transport_socket:
+  name: tls
+  typed_config:
+    "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+    type_url: envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+    value:
+      common_tls_context:
+        tls_certificates:
+        - certificate_chain: { filename: "test/opa/testdata/certs/server.cert" }
+          private_key: { filename: "test/opa/testdata/certs/server-key.cert" }
+        validation_context:
+          trusted_ca: { filename: "test/opa/testdata/certs/root.cert" }
+      require_client_certificate: true

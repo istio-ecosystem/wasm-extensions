@@ -21,12 +21,15 @@ jobs:
           COMMIT=$(git rev-list -n 1 ${{ github.ref }})
           gsutil cp gs://istio-ecosystem/wasm-extensions/basic-auth/${COMMIT}.wasm basic-auth.wasm
           gsutil cp gs://istio-ecosystem/wasm-extensions/local-rate-limit/${COMMIT}.wasm local-rate-limit.wasm
+          gsutil cp gs://istio-ecosystem/wasm-extensions/open-policy-agent/${COMMIT}.wasm open-policy-agent.wasm
           # Also prepare an Wasm extension dir for GCS uploading.
           mkdir -p wasm-extensions/basic-auth
           mkdir -p wasm-extensions/local-rate-limit
+          mkdir -p wasm-extensions/open-policy-agent
           GITHUB_TAG_REF=${{ github.ref }}
           cp basic-auth.wasm wasm-extensions/basic-auth/${GITHUB_TAG_REF##*/}.wasm
           cp local-rate-limit.wasm wasm-extensions/local-rate-limit/${GITHUB_TAG_REF##*/}.wasm
+          cp open-policy-agent.wasm wasm-extensions/open-policy-agent/${GITHUB_TAG_REF##*/}.wasm
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -55,7 +58,17 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./local-rate-limit.wasm
-          asset_name: local-rate-limitwasm
+          asset_name: local-rate-limit.wasm
+          asset_content_type: application/wasm
+      - name: Upload Open Policy Agent Release Asset
+        id: upload-open-policy-agent-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./open-policy-agent.wasm
+          asset_name: open-policy-agent.wasm
           asset_content_type: application/wasm
       - name: Upload Modules
         uses: GoogleCloudPlatform/github-actions/upload-cloud-storage@master
