@@ -80,7 +80,7 @@ An [integration test](../example/test) is also added to the example extension, w
 
 To further harden your extension, it is also **highly** recommended to write unit tests for it. In the unit test, a mock host will be created, which could implement any relevant Wasm callbacks with desired simulation. Specifically, the unit test set up will utilize `null plugin` mode provided by [C++ Wasm host](https://github.com/proxy-wasm/proxy-wasm-cpp-host), under which the extension will be built to a native binary with common C++ toolchain, instead WebAssembly binary with Wasm toolchain.
 
-An unit test example could be found under the [basic auth plugin](../extensions/basic_auth/plugin_test.cc), where several callbacks are mocked, such as `getBuffer` is mocked to return desired configuration, `getHeaderMapValue` is mocked to return wanted header pair. The whole test needs to be wrapped with `null_plugin` namespace. To learn more about how to write unit tests for the extension, please refer to this [guide](./write-unit-test.md).
+An unit test example could be found under the [basic auth plugin](../extensions/basic_auth/plugin_test.cc), where several callbacks are mocked, such as `getBuffer` is mocked to return desired configuration, `getHeaderMapValue` is mocked to return wanted header pair. The whole test needs to be wrapped with `null_plugin` namespace. To learn more about how to write unit tests for the extension, please refer to this [guide](./write-cpp-unit-test.md).
 
 ## Step 6: Push and deploy the extension
 ---
