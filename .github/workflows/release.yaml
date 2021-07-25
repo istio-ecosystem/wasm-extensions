@@ -71,7 +71,7 @@ jobs:
           asset_name: open-policy-agent.wasm
           asset_content_type: application/wasm
       - name: Upload Modules
-        uses: GoogleCloudPlatform/github-actions/upload-cloud-storage@main
+        uses: google-github-actions/upload-cloud-storage@main
         with:
           path: wasm-extensions/
           destination: istio-ecosystem
