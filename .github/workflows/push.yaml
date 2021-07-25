@@ -55,7 +55,7 @@ jobs:
           done
 
       - name: Upload Modules
-        uses: GoogleCloudPlatform/github-actions/upload-cloud-storage@master
+        uses: GoogleCloudPlatform/github-actions/upload-cloud-storage@main
         with:
           path: wasm-extensions/
           destination: istio-ecosystem
