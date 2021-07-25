@@ -30,11 +30,10 @@ ENVOY_TMP_DIR=$(mktemp -d -t envoy-XXXXXXXXXX)
 trap "rm -rf ${ENVOY_TMP_DIR}" EXIT
 
 cd ${ENVOY_TMP_DIR}
-if [[ ${RELEASE} == "master" ]]; then
-  git clone --depth=1 --branch main https://github.com/envoyproxy/envoy
-else
-  git clone --depth=1 --branch release-${RELEASE} https://github.com/istio/envoy
-fi
+git clone --depth=1 https://github.com/envoyproxy/envoy
+cd envoy
+git remote add istio-envoy https://github.com/istio/envoy
+git fetch istio-envoy
 cd envoy
 
 # SDK SHA update
