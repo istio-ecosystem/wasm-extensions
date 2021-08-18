@@ -13,6 +13,10 @@ sudo wget -O /usr/local/bin/bazel https://github.com/bazelbuild/bazelisk/release
 sudo chmod +x /usr/local/bin/bazel
 ```
 
+On MacOS, you can `brew install bazelisk`. This adds both `bazelisk` and `bazel` to the `PATH`.
+
+For additional installation methods such as using `npm` and advanced configuration see the [official Bazelisk Installation Guide](https://github.com/bazelbuild/bazelisk#installation).
+
 ### Installing Minimum Dependencies
 
 Several dependencies are needs in order to build a C++ WebAssembly extensions with Bazel.
