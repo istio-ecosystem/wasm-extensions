@@ -35,9 +35,12 @@ class BasicAuthTest : public ::testing::Test {
   BasicAuthTest() {
     // Initialize test VM
     test_vm_ = createNullVm();
-    wasm_base_ =
-        std::make_unique<WasmBase>(std::move(test_vm_), "test-vm", "", "");
-    wasm_base_->initialize("basic_auth");
+    wasm_base_ = std::make_unique<WasmBase>(
+        std::move(test_vm_), "test-vm", "", "",
+        std::unordered_map<std::string, std::string>{},
+        AllowedCapabilitiesMap{});
+    wasm_base_->load("basic_auth");
+    wasm_base_->initialize();
 
     // Initialize host side context
     mock_context_ = std::make_unique<MockContext>(wasm_base_.get());

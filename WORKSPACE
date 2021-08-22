@@ -2,8 +2,8 @@ workspace(name = "istio_ecosystem_wasm_extensions")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-PROXY_WASM_CPP_SDK_SHA = "956f0d500c380cc1656a2d861b7ee12c2515a664"
-PROXY_WASM_CPP_SDK_SHA256 = "b97e3e716b1f38dc601487aa0bde72490bbc82b8f3ad73f1f3e69733984955df"
+PROXY_WASM_CPP_SDK_SHA = "fd0be8405db25de0264bdb78fae3a82668c03782"
+PROXY_WASM_CPP_SDK_SHA256 = "c57de2425b5c61d7f630c5061e319b4557ae1f1c7526e5a51c33dc1299471b08"
 
 http_archive(
     name = "proxy_wasm_cpp_sdk",
@@ -22,8 +22,8 @@ wasm_dependencies_extra()
 
 ### optional imports ###
 # To import commonly used libraries from istio proxy, such as base64, json, and flatbuffer.
-IO_ISTIO_PROXY_SHA = "a4e4b362e334f4275ac2154fb831ddf3cf45db03"
-IO_ISTIO_PROXY_SHA256 = "23296eb7a31e42eb2845488f6869539332dc705c72a3b0ebd196bdaf6d16c23c"
+IO_ISTIO_PROXY_SHA = "494a674e70543a319ad4865482c125581f5746bf"
+IO_ISTIO_PROXY_SHA256 = "daa108440afe8107fb7da93f5da77340f51ddc850f1393b44e83c51f2ff53081"
 
 http_archive(
     name = "io_istio_proxy",
