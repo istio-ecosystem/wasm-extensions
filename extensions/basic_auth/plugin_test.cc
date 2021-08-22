@@ -74,7 +74,7 @@ class BasicAuthTest : public ::testing::Test {
   }
   ~BasicAuthTest() override {}
 
-  std::shared_ptr<WasmBase> wasm_base_;
+  std::unique_ptr<WasmBase> wasm_base_;
   std::unique_ptr<WasmVm> test_vm_;
   std::unique_ptr<MockContext> mock_context_;
 
