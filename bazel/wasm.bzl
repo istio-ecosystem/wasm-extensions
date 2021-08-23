@@ -20,8 +20,8 @@ def wasm_libraries():
         urls = ["https://github.com/google/googletest/archive/release-1.10.0.tar.gz"],
     )
 
-    PROXY_WASM_CPP_HOST_SHA = "6dab125d7a668c7158848b6f48c67fd827c952e6"
-    PROXY_WASM_CPP_HOST_SHA256 = "b5c73ed053a7079bd8bf53b14c4811e87ae521d9fcf4769ec5b248202a27600d"
+    PROXY_WASM_CPP_HOST_SHA = "aba2704bcd7d8adce2ccaf07c4ecbaf0cffeb7ef"
+    PROXY_WASM_CPP_HOST_SHA256 = "6263b45f87fc0c106eb88f31238553b1bde68f8a5ea25e20e95a5e6624a896d2"
 
     http_archive(
         name = "proxy_wasm_cpp_host",
