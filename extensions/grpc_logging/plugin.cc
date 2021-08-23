@@ -31,7 +31,7 @@ bool PluginRootContext::onConfigure(size_t configuration_size) {
   json_options.ignore_unknown_fields = true;
   PluginConfig config;
   Status status = JsonStringToMessage(configuration, &config, json_options);
-  if (status != Status::OK) {
+  if (!status.ok()) {
     LOG_WARN(
         absl::StrCat("cannot parse logging plugin configuration JSON string ",
                      configuration, ", ", status.message().ToString()));
