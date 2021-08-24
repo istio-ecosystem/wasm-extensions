@@ -42,7 +42,11 @@ ENVOY_TMP_DIR=$(mktemp -d -t envoy-XXXXXXXXXX)
 trap "rm -rf ${ENVOY_TMP_DIR}" EXIT
 
 pushd ${ENVOY_TMP_DIR}
-git clone --depth=1 --branch release-${RELEASE} https://github.com/istio/envoy
+
+git clone --depth=1 https://github.com/envoyproxy/envoy
+cd envoy
+git remote add istio-envoy https://github.com/istio/envoy
+git fetch istio-envoy
 cd envoy
 
 NEW_SDK_SHA=$(bazel query //external:proxy_wasm_cpp_sdk --output=build | grep -Pom1 "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/\K[a-zA-Z0-9]{40}")
@@ -54,14 +58,6 @@ popd
 sed -e "s|PROXY_WASM_CPP_SDK_SHA = .*|PROXY_WASM_CPP_SDK_SHA = \"${NEW_SDK_SHA}\"|" -i example/WORKSPACE
 sed -e "s|PROXY_WASM_CPP_SDK_SHA256 = .*|PROXY_WASM_CPP_SDK_SHA256 = \"${NEW_SDK_SHA256}\"|" -i example/WORKSPACE
 sed -e "s|DownloadVersion:.*|DownloadVersion: \"${RELEASE}\",|" -i example/test/example_test.go
-
-# Update example config with wasm file of the new version.
-EXAMPLE_WASM_MODULE_URL="https://storage.googleapis.com/istio-ecosystem/wasm-extensions/example/${RELEASE}.0.wasm"
-EXAMPLE_MODULE_CHECKSUM=$(wget ${EXAMPLE_WASM_MODULE_URL} && sha256sum ${RELEASE}.0.wasm | cut -d' ' -f 1)
-trap "rm -rf ${RELEASE}.0.wasm" EXIT
-sed -e "s|uri: .*|uri: ${EXAMPLE_WASM_MODULE_URL}|" -i example/config/example-filter.yaml
-sed -e "s|sha256: .*|sha256: ${EXAMPLE_MODULE_CHECKSUM}|" -i example/config/example-filter.yaml
-rm -rf ${RELEASE}.0.wasm
 
 semverParseInto ${RELEASE}.0 MAJOR MINOR PATCH
 # Update basic auth config with wasm file of the new version.
