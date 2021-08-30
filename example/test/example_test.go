@@ -25,7 +25,7 @@ func TestExamplePlugin(t *testing.T) {
 			},
 			&driver.Envoy{
 				Bootstrap:       params.FillTestData(string(testdata.MustAsset("bootstrap/server.yaml.tmpl"))),
-				DownloadVersion: "1.9",
+				DownloadVersion: "1.11",
 			},
 			&driver.Sleep{Duration: 1 * time.Second},
 			&driver.HTTPCall{

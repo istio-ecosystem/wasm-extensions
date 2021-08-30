@@ -13,7 +13,7 @@ spec:
           filter:
             name: envoy.http_connection_manager
       proxy:
-        proxyVersion: ^1\.9.*
+        proxyVersion: ^1\.11.*
     patch:
       operation: INSERT_BEFORE
       value:
@@ -60,10 +60,10 @@ spec:
                 code:
                   remote:
                     http_uri:
-                      uri: https://github.com/istio-ecosystem/wasm-extensions/releases/download/1.9.0/basic-auth.wasm
+                      uri: https://github.com/istio-ecosystem/wasm-extensions/releases/download/1.11.0/basic-auth.wasm
                     # Optional: specifying checksum will let istio agent
                     # verify the checksum of download artifacts. Missing
                     # checksum will cause the Wasm module to be downloaded
                     # repeatedly
-                    sha256: 6b0cecad751940eeedd68de5b9bcf940d0aac8bfc5f61c18d71985ee9460ee77
+                    sha256: 1a9aec2e3356a5ce3b69e99822cb4a1aada8eebeea1c3f73b19672796b3bcc16
                 runtime: envoy.wasm.runtime.v8
