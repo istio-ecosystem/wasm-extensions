@@ -64,7 +64,7 @@ jobs:
       - name: Push Wasm OCI images
         run: |
           for target in $(bazel query ...); do
-            if [[ "{$target}" == *":push_wasm_image"* ]]; then
+            if [[ "{$target}" == *":push_oci_image"* ]]; then
               bazel run --define WASM_IMAGE_TAG=${GITHUB_SHA} "${target}"
             fi
           done
