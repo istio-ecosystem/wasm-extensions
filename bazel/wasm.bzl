@@ -40,11 +40,11 @@ def declare_wasm_image_targets(name, wasm_file):
     # Rename to the spec compatible name.
     copy_file("copy_original_file", wasm_file, "plugin.wasm")
     container_image(
-        name = "wasm_image",
+        name = "oci_image",
         files = [":plugin.wasm"],
     )
     container_push(
-        name = "push_wasm_image",
+        name = "push_oci_image",
         format = "OCI",
         image = ":wasm_image",
         registry = "ghcr.io",
