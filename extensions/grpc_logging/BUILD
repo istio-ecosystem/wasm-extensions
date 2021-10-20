@@ -1,4 +1,5 @@
 load("@proxy_wasm_cpp_sdk//bazel/wasm:wasm.bzl", "wasm_cc_binary")
+load("//bazel:wasm.bzl", "declare_wasm_image_targets")
 
 wasm_cc_binary(
     name = "grpc_logging.wasm",
@@ -37,3 +38,5 @@ proto_library(
         "@com_google_protobuf//:timestamp_proto",
     ],
 )
+
+declare_wasm_image_targets(name ="grpc_logging", wasm_file = ":grpc_logging.wasm")

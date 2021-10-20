@@ -1,5 +1,11 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@io_istio_proxy//bazel:wasm.bzl", "wasm_dependencies")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_image",
+    "container_push",
+)
 
 def wasm_libraries():
     http_archive(
@@ -28,4 +34,20 @@ def wasm_libraries():
         sha256 = PROXY_WASM_CPP_HOST_SHA256,
         strip_prefix = "proxy-wasm-cpp-host-" + PROXY_WASM_CPP_HOST_SHA,
         url = "https://github.com/proxy-wasm/proxy-wasm-cpp-host/archive/" + PROXY_WASM_CPP_HOST_SHA +".tar.gz",
+    )
+
+def declare_wasm_image_targets(name, wasm_file):
+    # Rename to the spec compatible name.
+    copy_file("copy_original_file", wasm_file, "plugin.wasm")
+    container_image(
+        name = "wasm_image",
+        files = [":plugin.wasm"],
+    )
+    container_push(
+        name = "push_wasm_image",
+        format = "OCI",
+        image = ":wasm_image",
+        registry = "ghcr.io",
+        repository = "istio-ecosystem/wasm-extensions/"+name,
+        tag = "$(WASM_IMAGE_TAG)",
     )

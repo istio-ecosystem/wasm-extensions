@@ -1,4 +1,5 @@
 load("@proxy_wasm_cpp_sdk//bazel/wasm:wasm.bzl", "wasm_cc_binary")
+load("//bazel:wasm.bzl", "declare_wasm_image_targets")
 
 wasm_cc_binary(
     name = "basic_auth.wasm",
@@ -16,7 +17,7 @@ wasm_cc_binary(
 )
 
 cc_library(
-    name = "basic_auth",
+    name = "basic_auth_lib",
     srcs = [
         "plugin.cc",
         "@io_istio_proxy//extensions/common/wasm:base64.h",
@@ -40,9 +41,11 @@ cc_test(
     ],
     copts = ["-DNULL_PLUGIN"],
     deps = [
-        ":basic_auth",
+        ":basic_auth_lib",
         "@com_google_googletest//:gtest",
         "@com_google_googletest//:gtest_main",
         "@proxy_wasm_cpp_host//:lib",
     ],
 )
+
+declare_wasm_image_targets(name = "basic_auth", wasm_file = ":basic_auth.wasm")
