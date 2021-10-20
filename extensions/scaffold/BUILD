@@ -12,4 +12,7 @@ wasm_cc_binary(
     ],
 )
 
-declare_wasm_image_targets(name ="scaffold", wasm_file = ":scaffold.wasm")
+declare_wasm_image_targets(
+    name = "scaffold",
+    wasm_file = ":scaffold.wasm",
+)

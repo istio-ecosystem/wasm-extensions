@@ -39,4 +39,7 @@ proto_library(
     ],
 )
 
-declare_wasm_image_targets(name ="grpc_logging", wasm_file = ":grpc_logging.wasm")
+declare_wasm_image_targets(
+    name = "grpc_logging",
+    wasm_file = ":grpc_logging.wasm",
+)

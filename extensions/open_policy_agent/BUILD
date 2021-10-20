@@ -15,4 +15,7 @@ wasm_cc_binary(
     ],
 )
 
-declare_wasm_image_targets(name ="open_policy_agent", wasm_file = ":open_policy_agent.wasm")
+declare_wasm_image_targets(
+    name = "open_policy_agent",
+    wasm_file = ":open_policy_agent.wasm",
+)

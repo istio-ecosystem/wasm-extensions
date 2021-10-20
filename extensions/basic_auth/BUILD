@@ -48,4 +48,7 @@ cc_test(
     ],
 )
 
-declare_wasm_image_targets(name = "basic_auth", wasm_file = ":basic_auth.wasm")
+declare_wasm_image_targets(
+    name = "basic_auth",
+    wasm_file = ":basic_auth.wasm",
+)

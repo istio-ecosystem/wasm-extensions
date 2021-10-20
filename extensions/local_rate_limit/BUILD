@@ -16,4 +16,7 @@ wasm_cc_binary(
     ],
 )
 
-declare_wasm_image_targets(name ="local_rate_limit", wasm_file = ":local_rate_limit.wasm")
+declare_wasm_image_targets(
+    name = "local_rate_limit",
+    wasm_file = ":local_rate_limit.wasm",
+)
