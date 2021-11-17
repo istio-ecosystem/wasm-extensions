@@ -77,9 +77,9 @@ func TestOPA(t *testing.T) {
 					&driver.Stats{
 						AdminPort: params.Ports.ServerAdmin,
 						Matchers: map[string]driver.StatMatcher{
-							"envoy_wasm_filter_opa_filter_cache_hit_policy_cache_count": &driver.
+							"wasm_filter_opa_filter_cache_hit_policy_cache_count": &driver.
 								ExactStat{Metric: "test/opa/testdata/stats/cache_hit.yaml.tmpl"},
-							"envoy_wasm_filter_opa_filter_cache_miss_policy_cache_count": &driver.
+							"wasm_filter_opa_filter_cache_miss_policy_cache_count": &driver.
 								ExactStat{Metric: "test/opa/testdata/stats/cache_miss.yaml.tmpl"},
 						},
 					},
