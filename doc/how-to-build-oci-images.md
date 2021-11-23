@@ -6,7 +6,7 @@ This document describes how to build OCI images which are consumable by Istio.
 
 ## Overview
 
-There are two types of OCI images are supported by Istio. One is in the Docker format, and another is the standard OCI specification compliant format. Please note that both of them are supported by any OCI registries, and you can operate on standard CLI tools e.g. Docker CLI, [buildah](https://buildah.io/), etc. You can choose either format depending on your preference, and both types of containers are consumable by Istio Wasm Plugin API.
+There are two types of OCI images that are supported by Istio. One is in the Docker format, and another is the standard OCI specification compliant format. Please note that both of them are supported by any OCI registries, and you can operate on standard CLI tools e.g. Docker CLI, [buildah](https://buildah.io/), etc. You can choose either format depending on your preference, and both types of containers are consumable by Istio Wasm Plugin API.
 
 For the formal specification, please refer to [the link here](https://github.com/solo-io/wasm/blob/master/spec/spec-compat.md).
 
