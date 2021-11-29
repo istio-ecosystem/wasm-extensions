@@ -72,21 +72,6 @@ jobs:
         cd example
         bazel build //:example.wasm
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GHCR_TOKEN }}
-
-    - name: Push Wasm OCI images
-      run: |
-        for target in $(bazel query //extensions/...); do
-          if [[ "{$target}" == *":push_wasm_image"* ]]; then
-            bazel run --define WASM_IMAGE_TAG=${GITHUB_SHA} "${target}"
-          fi
-        done
-
     - name: Example Integration Test
       run: |
         set -eux
