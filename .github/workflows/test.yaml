@@ -47,6 +47,10 @@ jobs:
             # skip wasm transition target
             continue
           fi
+          if [[ "${target}" != *".wasm" ]]; then
+            # Build wasm modules only
+            continue
+          fi
           "${GITHUB_WORKSPACE}/bin/bazel" build "${target}"
         done
 
