@@ -76,3 +76,17 @@ jobs:
           path: wasm-extensions/
           destination: istio-ecosystem
           credentials: ${{ secrets.WASM_UPLOAD_CRED }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Push Wasm OCI images
+        run: |
+          GITHUB_TAG_REF=${{ github.ref }}
+          for target in $(bazel query //extensions/...); do
+            if [[ "{$target}" == *":push_wasm_image"* ]]; then
+              bazel run --define WASM_IMAGE_TAG=${GITHUB_TAG_REF##*/} "${target}"
+            fi
+          done
