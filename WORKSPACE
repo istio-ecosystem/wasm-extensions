@@ -42,9 +42,9 @@ wasm_dependencies_extra()
 
 ### optional imports ###
 # To import commonly used libraries from istio proxy, such as base64, json, and flatbuffer.
-IO_ISTIO_PROXY_SHA = "e40ab8a05507b4427929d10cacc19243183a2b31"
+IO_ISTIO_PROXY_SHA = "a70bc93ce0610007bf5275091c6e7b455d397768"
 
-IO_ISTIO_PROXY_SHA256 = "7e6d396e34da22f1955d1c6eb7283c7bd8ebe4147e7c151dc51992aaa14412fd"
+IO_ISTIO_PROXY_SHA256 = "6621459c49c47f84b96b7bc2797652bc5a94c6a5dc1c89056ef5c38e05303d13"
 
 http_archive(
     name = "io_istio_proxy",
