@@ -6,7 +6,7 @@ This guide will walk you through how to write, test, deploy, and maintain a HTTP
 ## Step 1: Initialize a Bazel workspace
 ---
 
-Create a folder for the extension code. Under the folder, craete a `WORKSPACE` file , which pulls in proxy wasm cpp SDK and necessary toolchain dependencies to build a Wasm filter. The follow is a minimum `WORKSPACE` file used by the example Wasm extension, which pulls the C++ proxy Wasm SDK and invoke several rules to import tool chain:
+Create a folder for the extension code. Under the folder, create a `WORKSPACE` file , which pulls in proxy wasm cpp SDK and necessary toolchain dependencies to build a Wasm filter. The follow is a minimum `WORKSPACE` file used by the example Wasm extension, which pulls the C++ proxy Wasm SDK and invoke several rules to import tool chain:
 
 ```python
 # Pulls proxy wasm cpp SDK with a specific SHA
