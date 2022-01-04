@@ -68,7 +68,7 @@ PROXY_WASM_NULL_PLUGIN_REGISTRY
 #endif
 ```
 
-Then to build the extension under `nullVM` mode, the following target is added to the `BUILD` file. The target is similiar to the one generated Wasm binary, except that it uses `cc_binary` and defines `NULL_PLUGIN` macro in `copts`.
+Then to build the extension under `nullVM` mode, the following target is added to the `BUILD` file. The target is similiar to the one generated Wasm binary, except that it uses `cc_library` and defines `NULL_PLUGIN` macro in `copts`.
 
 `BUILD`
 ```python
