@@ -158,7 +158,11 @@ void PluginRootContext::flushLogBuffer() {
 void PluginRootContext::sendLogRequest(bool ondone) {
   is_on_done_ = ondone;
   HeaderStringPairs initial_metadata;
-  for (const auto& req : req_buffer_) {
+
+  std::vector<std::unique_ptr<WriteLogRequest>>::iterator itr =
+      req_buffer_.begin();
+  while (itr != req_buffer_.end()) {
+    const auto& req = *itr;
     auto result = grpcSimpleCall(
         grpc_service_,
         /* service name */
@@ -171,6 +175,8 @@ void PluginRootContext::sendLogRequest(bool ondone) {
       break;
     }
     in_flight_export_call_ += 1;
+    // delete req_buffer_ req data;
+    itr = req_buffer_.erase(itr);
   }
 }
 
