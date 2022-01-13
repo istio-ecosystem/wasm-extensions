@@ -156,22 +156,27 @@ void PluginRootContext::flushLogBuffer() {
 }
 
 void PluginRootContext::sendLogRequest(bool ondone) {
-  is_on_done_ = ondone;
-  HeaderStringPairs initial_metadata;
-  for (const auto& req : req_buffer_) {
-    auto result = grpcSimpleCall(
-        grpc_service_,
-        /* service name */
-        "istio_ecosystem.wasm_extensions.grpc_logging.LoggingService",
-        /* method name */ "WriteLog", initial_metadata, *req,
-        /* time out in milliseconds */ 5000, success_callback_,
-        failure_callback_);
-    if (result != WasmResult::Ok) {
-      LOG_WARN("failed to make stackdriver logging export call");
-      break;
+    is_on_done_ = ondone;
+    HeaderStringPairs initial_metadata;
+
+    std::vector<std::unique_ptr<WriteLogRequest>>::iterator itr = req_buffer_.begin();
+    while (itr != req_buffer_.end()) {
+        const auto &req = *itr;
+        auto result = grpcSimpleCall(
+                grpc_service_,
+                /* service name */
+                "istio_ecosystem.wasm_extensions.grpc_logging.LoggingService",
+                /* method name */ "WriteLog", initial_metadata, *req,
+                /* time out in milliseconds */ 5000, success_callback_,
+                failure_callback_);
+        if (result != WasmResult::Ok) {
+            LOG_WARN("failed to make stackdriver logging export call");
+            break;
+        }
+        in_flight_export_call_ += 1;
+        // delete req_buffer_ req data;
+        itr = req_buffer_.erase(itr);
     }
-    in_flight_export_call_ += 1;
-  }
 }
 
 void PluginContext::onLog() { rootContext()->addLogEntry(this); }
