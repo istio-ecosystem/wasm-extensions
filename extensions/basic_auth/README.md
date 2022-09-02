@@ -7,7 +7,7 @@ Basic Auth filter is shipped as a WebAssembly module from this repo.
 It is versioned following Istio minor release (e.g. basic auth Wasm module with version 1.9.x should work with any Istio 1.9 patch versions).
 All released versions could be found [here](https://github.com/istio-ecosystem/wasm-extensions/releases).
 
-Before going through this guide, please read official Istio document about [Wasm module remote load](https://istio.io/latest/docs/ops/configuration/extensibility/wasm-module-distribution/).
+Before going through this guide, please read official Istio document about [Wasm module remote load](https://istio.io/latest/docs/tasks/extensibility/wasm-module-distribution/).
 
 ## Deploy basic auth filter
 
@@ -99,4 +99,4 @@ If you have any feature request or bug report, please open an issue in this repo
 * [ ] Add regex to path matching
 
 It is recommended to customize the extension according to your needs.
-Please take a look at [Wasm extension C++ development guide](../doc/write-a-wasm-extension-with-cpp.md) for more information about how to write your own extension.
+Please take a look at [Wasm extension C++ development guide](../../doc/write-a-wasm-extension-with-cpp.md) for more information about how to write your own extension.
