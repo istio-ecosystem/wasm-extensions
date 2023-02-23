@@ -11,55 +11,18 @@ namespace Common {
 
 struct KeyVal;
 struct KeyValBuilder;
-struct KeyValT;
 
 struct FlatNode;
 struct FlatNodeBuilder;
-struct FlatNodeT;
-
-bool operator==(const KeyValT &lhs, const KeyValT &rhs);
-bool operator!=(const KeyValT &lhs, const KeyValT &rhs);
-bool operator==(const FlatNodeT &lhs, const FlatNodeT &rhs);
-bool operator!=(const FlatNodeT &lhs, const FlatNodeT &rhs);
-
-inline const flatbuffers::TypeTable *KeyValTypeTable();
-
-inline const flatbuffers::TypeTable *FlatNodeTypeTable();
-
-struct KeyValT : public flatbuffers::NativeTable {
-  typedef KeyVal TableType;
-  std::string key;
-  std::string value;
-  KeyValT() {
-  }
-};
-
-inline bool operator==(const KeyValT &lhs, const KeyValT &rhs) {
-  return
-      (lhs.key == rhs.key) &&
-      (lhs.value == rhs.value);
-}
-
-inline bool operator!=(const KeyValT &lhs, const KeyValT &rhs) {
-    return !(lhs == rhs);
-}
-
 
 struct KeyVal FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef KeyValT NativeTableType;
   typedef KeyValBuilder Builder;
-  static const flatbuffers::TypeTable *MiniReflectTypeTable() {
-    return KeyValTypeTable();
-  }
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_KEY = 4,
     VT_VALUE = 6
   };
   const flatbuffers::String *key() const {
     return GetPointer<const flatbuffers::String *>(VT_KEY);
-  }
-  flatbuffers::String *mutable_key() {
-    return GetPointer<flatbuffers::String *>(VT_KEY);
   }
   bool KeyCompareLessThan(const KeyVal *o) const {
     return *key() < *o->key();
@@ -70,9 +33,6 @@ struct KeyVal FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *value() const {
     return GetPointer<const flatbuffers::String *>(VT_VALUE);
   }
-  flatbuffers::String *mutable_value() {
-    return GetPointer<flatbuffers::String *>(VT_VALUE);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_KEY) &&
@@ -81,9 +41,6 @@ struct KeyVal FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyString(value()) &&
            verifier.EndTable();
   }
-  KeyValT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(KeyValT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<KeyVal> Pack(flatbuffers::FlatBufferBuilder &_fbb, const KeyValT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct KeyValBuilder {
@@ -130,49 +87,8 @@ inline flatbuffers::Offset<KeyVal> CreateKeyValDirect(
       value__);
 }
 
-flatbuffers::Offset<KeyVal> CreateKeyVal(flatbuffers::FlatBufferBuilder &_fbb, const KeyValT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct FlatNodeT : public flatbuffers::NativeTable {
-  typedef FlatNode TableType;
-  std::string name;
-  std::string namespace_;
-  std::vector<flatbuffers::unique_ptr<Wasm::Common::KeyValT>> labels;
-  std::string owner;
-  std::string workload_name;
-  std::vector<flatbuffers::unique_ptr<Wasm::Common::KeyValT>> platform_metadata;
-  std::string istio_version;
-  std::string mesh_id;
-  std::vector<std::string> app_containers;
-  std::string cluster_id;
-  FlatNodeT() {
-  }
-};
-
-inline bool operator==(const FlatNodeT &lhs, const FlatNodeT &rhs) {
-  return
-      (lhs.name == rhs.name) &&
-      (lhs.namespace_ == rhs.namespace_) &&
-      (lhs.labels == rhs.labels) &&
-      (lhs.owner == rhs.owner) &&
-      (lhs.workload_name == rhs.workload_name) &&
-      (lhs.platform_metadata == rhs.platform_metadata) &&
-      (lhs.istio_version == rhs.istio_version) &&
-      (lhs.mesh_id == rhs.mesh_id) &&
-      (lhs.app_containers == rhs.app_containers) &&
-      (lhs.cluster_id == rhs.cluster_id);
-}
-
-inline bool operator!=(const FlatNodeT &lhs, const FlatNodeT &rhs) {
-    return !(lhs == rhs);
-}
-
-
 struct FlatNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef FlatNodeT NativeTableType;
   typedef FlatNodeBuilder Builder;
-  static const flatbuffers::TypeTable *MiniReflectTypeTable() {
-    return FlatNodeTypeTable();
-  }
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4,
     VT_NAMESPACE_ = 6,
@@ -183,67 +99,41 @@ struct FlatNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ISTIO_VERSION = 16,
     VT_MESH_ID = 18,
     VT_APP_CONTAINERS = 20,
-    VT_CLUSTER_ID = 22
+    VT_CLUSTER_ID = 22,
+    VT_INSTANCE_IPS = 24
   };
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
-  flatbuffers::String *mutable_name() {
-    return GetPointer<flatbuffers::String *>(VT_NAME);
-  }
   const flatbuffers::String *namespace_() const {
     return GetPointer<const flatbuffers::String *>(VT_NAMESPACE_);
-  }
-  flatbuffers::String *mutable_namespace_() {
-    return GetPointer<flatbuffers::String *>(VT_NAMESPACE_);
   }
   const flatbuffers::Vector<flatbuffers::Offset<Wasm::Common::KeyVal>> *labels() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Wasm::Common::KeyVal>> *>(VT_LABELS);
   }
-  flatbuffers::Vector<flatbuffers::Offset<Wasm::Common::KeyVal>> *mutable_labels() {
-    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<Wasm::Common::KeyVal>> *>(VT_LABELS);
-  }
   const flatbuffers::String *owner() const {
     return GetPointer<const flatbuffers::String *>(VT_OWNER);
-  }
-  flatbuffers::String *mutable_owner() {
-    return GetPointer<flatbuffers::String *>(VT_OWNER);
   }
   const flatbuffers::String *workload_name() const {
     return GetPointer<const flatbuffers::String *>(VT_WORKLOAD_NAME);
   }
-  flatbuffers::String *mutable_workload_name() {
-    return GetPointer<flatbuffers::String *>(VT_WORKLOAD_NAME);
-  }
   const flatbuffers::Vector<flatbuffers::Offset<Wasm::Common::KeyVal>> *platform_metadata() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Wasm::Common::KeyVal>> *>(VT_PLATFORM_METADATA);
-  }
-  flatbuffers::Vector<flatbuffers::Offset<Wasm::Common::KeyVal>> *mutable_platform_metadata() {
-    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<Wasm::Common::KeyVal>> *>(VT_PLATFORM_METADATA);
   }
   const flatbuffers::String *istio_version() const {
     return GetPointer<const flatbuffers::String *>(VT_ISTIO_VERSION);
   }
-  flatbuffers::String *mutable_istio_version() {
-    return GetPointer<flatbuffers::String *>(VT_ISTIO_VERSION);
-  }
   const flatbuffers::String *mesh_id() const {
     return GetPointer<const flatbuffers::String *>(VT_MESH_ID);
-  }
-  flatbuffers::String *mutable_mesh_id() {
-    return GetPointer<flatbuffers::String *>(VT_MESH_ID);
   }
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *app_containers() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_APP_CONTAINERS);
   }
-  flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *mutable_app_containers() {
-    return GetPointer<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_APP_CONTAINERS);
-  }
   const flatbuffers::String *cluster_id() const {
     return GetPointer<const flatbuffers::String *>(VT_CLUSTER_ID);
   }
-  flatbuffers::String *mutable_cluster_id() {
-    return GetPointer<flatbuffers::String *>(VT_CLUSTER_ID);
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *instance_ips() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_INSTANCE_IPS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -270,11 +160,11 @@ struct FlatNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfStrings(app_containers()) &&
            VerifyOffset(verifier, VT_CLUSTER_ID) &&
            verifier.VerifyString(cluster_id()) &&
+           VerifyOffset(verifier, VT_INSTANCE_IPS) &&
+           verifier.VerifyVector(instance_ips()) &&
+           verifier.VerifyVectorOfStrings(instance_ips()) &&
            verifier.EndTable();
   }
-  FlatNodeT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(FlatNodeT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<FlatNode> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FlatNodeT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct FlatNodeBuilder {
@@ -311,6 +201,9 @@ struct FlatNodeBuilder {
   void add_cluster_id(flatbuffers::Offset<flatbuffers::String> cluster_id) {
     fbb_.AddOffset(FlatNode::VT_CLUSTER_ID, cluster_id);
   }
+  void add_instance_ips(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> instance_ips) {
+    fbb_.AddOffset(FlatNode::VT_INSTANCE_IPS, instance_ips);
+  }
   explicit FlatNodeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -333,8 +226,10 @@ inline flatbuffers::Offset<FlatNode> CreateFlatNode(
     flatbuffers::Offset<flatbuffers::String> istio_version = 0,
     flatbuffers::Offset<flatbuffers::String> mesh_id = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> app_containers = 0,
-    flatbuffers::Offset<flatbuffers::String> cluster_id = 0) {
+    flatbuffers::Offset<flatbuffers::String> cluster_id = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> instance_ips = 0) {
   FlatNodeBuilder builder_(_fbb);
+  builder_.add_instance_ips(instance_ips);
   builder_.add_cluster_id(cluster_id);
   builder_.add_app_containers(app_containers);
   builder_.add_mesh_id(mesh_id);
@@ -359,7 +254,8 @@ inline flatbuffers::Offset<FlatNode> CreateFlatNodeDirect(
     const char *istio_version = nullptr,
     const char *mesh_id = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *app_containers = nullptr,
-    const char *cluster_id = nullptr) {
+    const char *cluster_id = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *instance_ips = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto namespace___ = namespace_ ? _fbb.CreateString(namespace_) : 0;
   auto labels__ = labels ? _fbb.CreateVectorOfSortedTables<Wasm::Common::KeyVal>(labels) : 0;
@@ -370,6 +266,7 @@ inline flatbuffers::Offset<FlatNode> CreateFlatNodeDirect(
   auto mesh_id__ = mesh_id ? _fbb.CreateString(mesh_id) : 0;
   auto app_containers__ = app_containers ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*app_containers) : 0;
   auto cluster_id__ = cluster_id ? _fbb.CreateString(cluster_id) : 0;
+  auto instance_ips__ = instance_ips ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*instance_ips) : 0;
   return Wasm::Common::CreateFlatNode(
       _fbb,
       name__,
@@ -381,140 +278,8 @@ inline flatbuffers::Offset<FlatNode> CreateFlatNodeDirect(
       istio_version__,
       mesh_id__,
       app_containers__,
-      cluster_id__);
-}
-
-flatbuffers::Offset<FlatNode> CreateFlatNode(flatbuffers::FlatBufferBuilder &_fbb, const FlatNodeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-inline KeyValT *KeyVal::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  flatbuffers::unique_ptr<Wasm::Common::KeyValT> _o = flatbuffers::unique_ptr<Wasm::Common::KeyValT>(new KeyValT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void KeyVal::UnPackTo(KeyValT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = key(); if (_e) _o->key = _e->str(); }
-  { auto _e = value(); if (_e) _o->value = _e->str(); }
-}
-
-inline flatbuffers::Offset<KeyVal> KeyVal::Pack(flatbuffers::FlatBufferBuilder &_fbb, const KeyValT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateKeyVal(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<KeyVal> CreateKeyVal(flatbuffers::FlatBufferBuilder &_fbb, const KeyValT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const KeyValT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _key = _fbb.CreateString(_o->key);
-  auto _value = _o->value.empty() ? 0 : _fbb.CreateString(_o->value);
-  return Wasm::Common::CreateKeyVal(
-      _fbb,
-      _key,
-      _value);
-}
-
-inline FlatNodeT *FlatNode::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  flatbuffers::unique_ptr<Wasm::Common::FlatNodeT> _o = flatbuffers::unique_ptr<Wasm::Common::FlatNodeT>(new FlatNodeT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void FlatNode::UnPackTo(FlatNodeT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = name(); if (_e) _o->name = _e->str(); }
-  { auto _e = namespace_(); if (_e) _o->namespace_ = _e->str(); }
-  { auto _e = labels(); if (_e) { _o->labels.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->labels[_i] = flatbuffers::unique_ptr<Wasm::Common::KeyValT>(_e->Get(_i)->UnPack(_resolver)); } } }
-  { auto _e = owner(); if (_e) _o->owner = _e->str(); }
-  { auto _e = workload_name(); if (_e) _o->workload_name = _e->str(); }
-  { auto _e = platform_metadata(); if (_e) { _o->platform_metadata.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->platform_metadata[_i] = flatbuffers::unique_ptr<Wasm::Common::KeyValT>(_e->Get(_i)->UnPack(_resolver)); } } }
-  { auto _e = istio_version(); if (_e) _o->istio_version = _e->str(); }
-  { auto _e = mesh_id(); if (_e) _o->mesh_id = _e->str(); }
-  { auto _e = app_containers(); if (_e) { _o->app_containers.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->app_containers[_i] = _e->Get(_i)->str(); } } }
-  { auto _e = cluster_id(); if (_e) _o->cluster_id = _e->str(); }
-}
-
-inline flatbuffers::Offset<FlatNode> FlatNode::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FlatNodeT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateFlatNode(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<FlatNode> CreateFlatNode(flatbuffers::FlatBufferBuilder &_fbb, const FlatNodeT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FlatNodeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
-  auto _namespace_ = _o->namespace_.empty() ? 0 : _fbb.CreateString(_o->namespace_);
-  auto _labels = _o->labels.size() ? _fbb.CreateVector<flatbuffers::Offset<Wasm::Common::KeyVal>> (_o->labels.size(), [](size_t i, _VectorArgs *__va) { return CreateKeyVal(*__va->__fbb, __va->__o->labels[i].get(), __va->__rehasher); }, &_va ) : 0;
-  auto _owner = _o->owner.empty() ? 0 : _fbb.CreateString(_o->owner);
-  auto _workload_name = _o->workload_name.empty() ? 0 : _fbb.CreateString(_o->workload_name);
-  auto _platform_metadata = _o->platform_metadata.size() ? _fbb.CreateVector<flatbuffers::Offset<Wasm::Common::KeyVal>> (_o->platform_metadata.size(), [](size_t i, _VectorArgs *__va) { return CreateKeyVal(*__va->__fbb, __va->__o->platform_metadata[i].get(), __va->__rehasher); }, &_va ) : 0;
-  auto _istio_version = _o->istio_version.empty() ? 0 : _fbb.CreateString(_o->istio_version);
-  auto _mesh_id = _o->mesh_id.empty() ? 0 : _fbb.CreateString(_o->mesh_id);
-  auto _app_containers = _o->app_containers.size() ? _fbb.CreateVectorOfStrings(_o->app_containers) : 0;
-  auto _cluster_id = _o->cluster_id.empty() ? 0 : _fbb.CreateString(_o->cluster_id);
-  return Wasm::Common::CreateFlatNode(
-      _fbb,
-      _name,
-      _namespace_,
-      _labels,
-      _owner,
-      _workload_name,
-      _platform_metadata,
-      _istio_version,
-      _mesh_id,
-      _app_containers,
-      _cluster_id);
-}
-
-inline const flatbuffers::TypeTable *KeyValTypeTable() {
-  static const flatbuffers::TypeCode type_codes[] = {
-    { flatbuffers::ET_STRING, 0, -1 },
-    { flatbuffers::ET_STRING, 0, -1 }
-  };
-  static const char * const names[] = {
-    "key",
-    "value"
-  };
-  static const flatbuffers::TypeTable tt = {
-    flatbuffers::ST_TABLE, 2, type_codes, nullptr, nullptr, names
-  };
-  return &tt;
-}
-
-inline const flatbuffers::TypeTable *FlatNodeTypeTable() {
-  static const flatbuffers::TypeCode type_codes[] = {
-    { flatbuffers::ET_STRING, 0, -1 },
-    { flatbuffers::ET_STRING, 0, -1 },
-    { flatbuffers::ET_SEQUENCE, 1, 0 },
-    { flatbuffers::ET_STRING, 0, -1 },
-    { flatbuffers::ET_STRING, 0, -1 },
-    { flatbuffers::ET_SEQUENCE, 1, 0 },
-    { flatbuffers::ET_STRING, 0, -1 },
-    { flatbuffers::ET_STRING, 0, -1 },
-    { flatbuffers::ET_STRING, 1, -1 },
-    { flatbuffers::ET_STRING, 0, -1 }
-  };
-  static const flatbuffers::TypeFunction type_refs[] = {
-    Wasm::Common::KeyValTypeTable
-  };
-  static const char * const names[] = {
-    "name",
-    "namespace_",
-    "labels",
-    "owner",
-    "workload_name",
-    "platform_metadata",
-    "istio_version",
-    "mesh_id",
-    "app_containers",
-    "cluster_id"
-  };
-  static const flatbuffers::TypeTable tt = {
-    flatbuffers::ST_TABLE, 10, type_codes, type_refs, nullptr, names
-  };
-  return &tt;
+      cluster_id__,
+      instance_ips__);
 }
 
 inline const Wasm::Common::FlatNode *GetFlatNode(const void *buf) {
@@ -523,10 +288,6 @@ inline const Wasm::Common::FlatNode *GetFlatNode(const void *buf) {
 
 inline const Wasm::Common::FlatNode *GetSizePrefixedFlatNode(const void *buf) {
   return flatbuffers::GetSizePrefixedRoot<Wasm::Common::FlatNode>(buf);
-}
-
-inline FlatNode *GetMutableFlatNode(void *buf) {
-  return flatbuffers::GetMutableRoot<FlatNode>(buf);
 }
 
 inline bool VerifyFlatNodeBuffer(
@@ -549,18 +310,6 @@ inline void FinishSizePrefixedFlatNodeBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
     flatbuffers::Offset<Wasm::Common::FlatNode> root) {
   fbb.FinishSizePrefixed(root);
-}
-
-inline flatbuffers::unique_ptr<Wasm::Common::FlatNodeT> UnPackFlatNode(
-    const void *buf,
-    const flatbuffers::resolver_function_t *res = nullptr) {
-  return flatbuffers::unique_ptr<Wasm::Common::FlatNodeT>(GetFlatNode(buf)->UnPack(res));
-}
-
-inline flatbuffers::unique_ptr<Wasm::Common::FlatNodeT> UnPackSizePrefixedFlatNode(
-    const void *buf,
-    const flatbuffers::resolver_function_t *res = nullptr) {
-  return flatbuffers::unique_ptr<Wasm::Common::FlatNodeT>(GetSizePrefixedFlatNode(buf)->UnPack(res));
 }
 
 }  // namespace Common

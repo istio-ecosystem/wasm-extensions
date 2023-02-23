@@ -33,6 +33,7 @@ wasm_cc_binary(
     ],
     copts = ["-UNULL_PLUGIN"],
     deps = [
+        ":config_cc_proto",
         "@io_istio_proxy//extensions/common/wasm:json_util",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
@@ -40,4 +41,16 @@ wasm_cc_binary(
         "@proxy_wasm_cpp_sdk//contrib:contrib_lib",
     ],
 )
+
+cc_proto_library(
+    name = "config_cc_proto",
+    visibility = ["//visibility:public"],
+    deps = ["config_proto"],
+)
+
+proto_library(
+    name = "config_proto",
+    srcs = ["config.proto"],
+)
+
 
