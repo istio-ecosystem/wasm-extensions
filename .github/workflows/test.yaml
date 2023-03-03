@@ -31,8 +31,6 @@ jobs:
     - name: Install clang-12
       run: |
         sudo apt install clang-12
-        export CC=clang-12
-        export CXX=clang++-12
 
     - uses: actions/setup-go@v2
       with:
@@ -56,7 +54,7 @@ jobs:
 
     - name: Unit Test
       run: |
-        "${GITHUB_WORKSPACE}/bin/bazel" test --test_output=errors //...
+        CC=clang-12 CXX=clang++-12 "${GITHUB_WORKSPACE}/bin/bazel" test --test_output=errors //...
 
     - name: Integration Test
       run: |
