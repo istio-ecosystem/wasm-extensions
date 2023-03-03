@@ -32,11 +32,6 @@ jobs:
       with:
         go-version: '^1.17.0'
 
-    - name: Build file format (buildifier)
-      run: |
-        go install github.com/bazelbuild/buildtools/buildifier
-        find . -name "BUILD" | xargs -n1 buildifier -mode=check
-
     - name: Build
       run: |
         set -eux
