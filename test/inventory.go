@@ -9,6 +9,7 @@ var ExtensionE2ETests *env.TestInventory
 func init() {
 	ExtensionE2ETests = &env.TestInventory{
 		Tests: []string{
+			"TestBasicAuth/Base64Credentials",
 			"TestBasicAuth/CorrectCredentials",
 			"TestBasicAuth/IncorrectCredentials",
 			"TestBasicAuth/MissingCredentials",
