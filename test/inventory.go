@@ -25,6 +25,8 @@ func init() {
 			"TestOPA/allow",
 			"TestOPA/deny",
 			"TestOPA/cache_expire",
+			"TestBasicAuth/Base64Credentials",
+			"TestExamplePlugin",
 		},
 	}
 }

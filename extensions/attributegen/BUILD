@@ -39,6 +39,8 @@ wasm_cc_binary(
         "@com_google_absl//absl/time",
         "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics_full",
         "@proxy_wasm_cpp_sdk//contrib:contrib_lib",
+        "@com_github_google_flatbuffers//:flatbuffers",
+        "@com_github_google_flatbuffers//:runtime_cc",
     ],
 )
 
