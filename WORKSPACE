@@ -3,14 +3,11 @@ workspace(name = "istio_ecosystem_wasm_extensions")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # Need to push Wasm OCI images
-
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 http_archive(
     name = "rules_oci",
-    sha256 = "be1fce88d05dd0b946f3c874f8af1a473468ea4daba0b69b459a5866416e10d5",
-    strip_prefix = "rules_oci-1.4.2",
-    url = "https://github.com/bazel-contrib/rules_oci/releases/download/v1.4.2/rules_oci-v1.4.2.tar.gz",
+    sha256 = "176e601d21d1151efd88b6b027a24e782493c5d623d8c6211c7767f306d655c8",
+    strip_prefix = "rules_oci-1.2.0",
+    url = "https://github.com/bazel-contrib/rules_oci/releases/download/v1.2.0/rules_oci-v1.2.0.tar.gz",
 )
 
 load("@rules_oci//oci:dependencies.bzl", "rules_oci_dependencies")
@@ -52,10 +49,10 @@ load("@istio_ecosystem_wasm_extensions//bazel:wasm.bzl", "wasm_libraries")
 wasm_libraries()
 
 # # To import proxy wasm cpp host, which will be used in unit testing.
-# load("@proxy_wasm_cpp_host//bazel:repositories.bzl", "proxy_wasm_cpp_host_repositories")
+load("@proxy_wasm_cpp_host//bazel:repositories.bzl", "proxy_wasm_cpp_host_repositories")
 
-# proxy_wasm_cpp_host_repositories()
+proxy_wasm_cpp_host_repositories()
 
-# load("@proxy_wasm_cpp_host//bazel:dependencies.bzl", "proxy_wasm_cpp_host_dependencies")
+load("@proxy_wasm_cpp_host//bazel:dependencies.bzl", "proxy_wasm_cpp_host_dependencies")
 
-# proxy_wasm_cpp_host_dependencies()
+proxy_wasm_cpp_host_dependencies()
