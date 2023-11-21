@@ -62,7 +62,8 @@ def declare_wasm_image_targets(name, wasm_file):
     )
     oci_image(
         name = "wasm_image",
-        base = "scratch",
+        architecture = "amd64",
+        os = "linux",
         tars = [":wasm_tar"],
     )
     oci_push(
