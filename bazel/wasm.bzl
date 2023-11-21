@@ -1,5 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
-load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push")
 
 def wasm_dependencies():
@@ -21,6 +21,9 @@ def wasm_dependencies():
     )
 
 def wasm_libraries():
+    """
+    Loads the necessary libraries for WebAssembly modules.
+    """
     ABSL_VERSION = "c8b33b0191a2db8364cacf94b267ea8a3f20ad83"
     http_archive(
         name = "com_google_absl",
@@ -31,13 +34,14 @@ def wasm_libraries():
 
     # import json, base64, and flatbuffer library from istio proxy repo
     wasm_dependencies()
-
+    
     # import google test and cpp host for unit testing
+    GOOGLE_TEST_VERSION = "f8d7d77c06936315286eb55f8de22cd23c188571"
     http_archive(
         name = "com_google_googletest",
-        sha256 = "9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb",
-        strip_prefix = "googletest-release-1.10.0",
-        urls = ["https://github.com/google/googletest/archive/release-1.10.0.tar.gz"],
+        sha256 = "7ff5db23de232a39cbb5c9f5143c355885e30ac596161a6b9fc50c4538bfbf01",
+        strip_prefix = "googletest-" + GOOGLE_TEST_VERSION,
+        urls = ["https://github.com/google/googletest/archive/" + GOOGLE_TEST_VERSION + ".tar.gz"],
     )
 
     PROXY_WASM_CPP_HOST_SHA = "f38347360feaaf5b2a733f219c4d8c9660d626f0"
@@ -51,17 +55,19 @@ def wasm_libraries():
     )
 
 def declare_wasm_image_targets(name, wasm_file):
-    # Rename to the spec compatible name.
-    copy_file("copy_original_file", wasm_file, "plugin.wasm")
+    pkg_tar(
+        name = "wasm_tar",
+        srcs = [wasm_file],
+        package_dir = "./plugin.wasm",
+    )
     oci_image(
         name = "wasm_image",
-        files = [":plugin.wasm"],
+        base = "scratch",
+        tars = [":wasm_tar"],
     )
     oci_push(
         name = "push_wasm_image",
-        format = "OCI",
         image = ":wasm_image",
-        registry = "ghcr.io",
-        repository = "istio-ecosystem/wasm-extensions/"+name,
-        tag = "$(WASM_IMAGE_TAG)",
+        repository = "ghcr.io/istio-ecosystem/wasm-extensions/"+name,
+        remote_tags = ["$(WASM_IMAGE_TAG)"],
     )

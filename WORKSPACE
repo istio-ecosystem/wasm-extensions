@@ -19,10 +19,21 @@ load("@rules_oci//oci:repositories.bzl", "LATEST_CRANE_VERSION", "oci_register_t
 oci_register_toolchains(
     name = "oci",
     crane_version = LATEST_CRANE_VERSION,
-    # Uncommenting the zot toolchain will cause it to be used instead of crane for some tasks.
-    # Note that it does not support docker-format images.
-    # zot_version = LATEST_ZOT_VERSION,
 )
+
+# rules_pkg
+http_archive(
+    name = "rules_pkg",
+    sha256 = "451e08a4d78988c06fa3f9306ec813b836b1d076d0f055595444ba4ff22b867f",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.7.1/rules_pkg-0.7.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.7.1/rules_pkg-0.7.1.tar.gz",
+    ],
+)
+
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+
+rules_pkg_dependencies()
 
 PROXY_WASM_CPP_SDK_SHA = "fd0be8405db25de0264bdb78fae3a82668c03782"
 
