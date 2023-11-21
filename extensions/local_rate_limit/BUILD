@@ -11,7 +11,7 @@ wasm_cc_binary(
     ],
     deps = [
         "@com_google_absl//absl/strings",
-        "@io_istio_proxy//extensions/common/wasm:json_util",
+        "//extensions/common/wasm:json_util",
         "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
     ],
 )

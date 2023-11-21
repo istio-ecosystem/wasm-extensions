@@ -6,12 +6,12 @@ wasm_cc_binary(
     srcs = [
         "plugin.cc",
         "plugin.h",
-        "@io_istio_proxy//extensions/common/wasm:base64.h",
+        "//extensions/common/wasm:base64.h",
     ],
     deps = [
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
-        "@io_istio_proxy//extensions/common/wasm:json_util",
+        "//extensions/common/wasm:json_util",
         "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
     ],
 )
@@ -20,7 +20,7 @@ cc_library(
     name = "basic_auth_lib",
     srcs = [
         "plugin.cc",
-        "@io_istio_proxy//extensions/common/wasm:base64.h",
+        "//extensions/common/wasm:base64.h",
     ],
     hdrs = [
         "plugin.h",
@@ -29,7 +29,7 @@ cc_library(
     deps = [
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
-        "@io_istio_proxy//extensions/common/wasm:json_util",
+        "//extensions/common/wasm:json_util",
         "@proxy_wasm_cpp_host//:lib",
     ],
 )

@@ -1,18 +1,32 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@io_istio_proxy//bazel:wasm.bzl", "wasm_dependencies")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-load(
-    "@io_bazel_rules_docker//container:container.bzl",
-    "container_image",
-    "container_push",
-)
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push")
+
+def wasm_dependencies():
+    FLAT_BUFFERS_VERSION = "23.3.3"
+
+    http_archive(
+        name = "com_github_google_flatbuffers",
+        sha256 = "8aff985da30aaab37edf8e5b02fda33ed4cbdd962699a8e2af98fdef306f4e4d",
+        strip_prefix = "flatbuffers-" + FLAT_BUFFERS_VERSION,
+        url = "https://github.com/google/flatbuffers/archive/v" + FLAT_BUFFERS_VERSION + ".tar.gz",
+    )
+
+    http_file(
+        name = "com_github_nlohmann_json_single_header",
+        sha256 = "3b5d2b8f8282b80557091514d8ab97e27f9574336c804ee666fda673a9b59926",
+        urls = [
+            "https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp",
+        ],
+    )
 
 def wasm_libraries():
+    ABSL_VERSION = "c8b33b0191a2db8364cacf94b267ea8a3f20ad83"
     http_archive(
         name = "com_google_absl",
-        sha256 = "ec8ef47335310cc3382bdc0d0cc1097a001e67dc83fcba807845aa5696e7e1e4",
-        strip_prefix = "abseil-cpp-302b250e1d917ede77b5ff00a6fd9f28430f1563",
-        url = "https://github.com/abseil/abseil-cpp/archive/302b250e1d917ede77b5ff00a6fd9f28430f1563.tar.gz",
+        sha256 = "a7803eac00bf68eae1a84ee3b9fcf0c1173e8d9b89b2cee92c7b487ea65be2a9",
+        strip_prefix = "abseil-cpp-" + ABSL_VERSION,
+        url = "https://github.com/abseil/abseil-cpp/archive/" + ABSL_VERSION + ".tar.gz",
     )
 
     # import json, base64, and flatbuffer library from istio proxy repo
@@ -39,11 +53,11 @@ def wasm_libraries():
 def declare_wasm_image_targets(name, wasm_file):
     # Rename to the spec compatible name.
     copy_file("copy_original_file", wasm_file, "plugin.wasm")
-    container_image(
+    oci_image(
         name = "wasm_image",
         files = [":plugin.wasm"],
     )
-    container_push(
+    oci_push(
         name = "push_wasm_image",
         format = "OCI",
         image = ":wasm_image",

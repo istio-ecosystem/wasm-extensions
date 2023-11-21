@@ -76,7 +76,7 @@ cc_library(
     name = "basic_auth",
     srcs = [
         "plugin.cc",
-        "@io_istio_proxy//extensions/common/wasm:base64.h",
+        "//extensions/common/wasm:base64.h",
     ],
     hdrs = [
         "plugin.h",
@@ -85,7 +85,7 @@ cc_library(
     deps = [
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
-        "@io_istio_proxy//extensions/common/wasm:json_util",
+        "//extensions/common/wasm:json_util",
         "@proxy_wasm_cpp_host//:lib",
     ],
 )

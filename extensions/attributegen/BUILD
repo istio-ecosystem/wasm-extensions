@@ -34,7 +34,7 @@ wasm_cc_binary(
     copts = ["-UNULL_PLUGIN"],
     deps = [
         ":config_cc_proto",
-        "@io_istio_proxy//extensions/common/wasm:json_util",
+        "//extensions/common/wasm:json_util",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
         "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics_full",
