@@ -28,9 +28,9 @@ jobs:
         mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
         chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
 
-    - name: Install clang-12
+    - name: Install clang-14
       run: |
-        sudo apt install clang-12
+        sudo apt install clang-14
 
     - uses: actions/setup-go@v2
       with:
@@ -54,7 +54,7 @@ jobs:
 
     - name: Unit Test
       run: |
-        CC=clang-12 CXX=clang++-12 "${GITHUB_WORKSPACE}/bin/bazel" test --test_output=errors //...
+        CC=clang-14 CXX=clang++-14 "${GITHUB_WORKSPACE}/bin/bazel" test --test_output=errors //...
 
     - name: Integration Test
       run: |
