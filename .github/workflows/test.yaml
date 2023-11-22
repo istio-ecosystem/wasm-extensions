@@ -30,7 +30,7 @@ jobs:
 
     - name: Install clang-14
       run: |
-        sudo apt install clang-14
+        sudo apt install clang-14 libtool
 
     - uses: actions/setup-go@v2
       with:
