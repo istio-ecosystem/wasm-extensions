@@ -28,10 +28,6 @@ jobs:
         mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
         chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
 
-    - name: Install clang-12
-      run: |
-        sudo apt install clang-12
-
     - uses: actions/setup-go@v2
       with:
         go-version: '^1.17.0'
@@ -54,7 +50,7 @@ jobs:
 
     - name: Unit Test
       run: |
-        CC=clang-12 CXX=clang++-12 "${GITHUB_WORKSPACE}/bin/bazel" test --test_output=errors //...
+        "${GITHUB_WORKSPACE}/bin/bazel" test --test_output=errors //...
 
     - name: Integration Test
       run: |

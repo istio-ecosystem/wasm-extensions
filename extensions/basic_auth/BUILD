@@ -1,18 +1,17 @@
-load("@proxy_wasm_cpp_sdk//bazel/wasm:wasm.bzl", "wasm_cc_binary")
+load("@proxy_wasm_cpp_sdk//bazel:defs.bzl", "proxy_wasm_cc_binary")
 load("//bazel:wasm.bzl", "declare_wasm_image_targets")
 
-wasm_cc_binary(
+proxy_wasm_cc_binary(
     name = "basic_auth.wasm",
     srcs = [
         "plugin.cc",
         "plugin.h",
-        "@io_istio_proxy//extensions/common/wasm:base64.h",
+        "//extensions/common/wasm:base64.h",
     ],
     deps = [
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
-        "@io_istio_proxy//extensions/common/wasm:json_util",
-        "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
+        "//extensions/common/wasm:json_util",
     ],
 )
 
@@ -20,7 +19,7 @@ cc_library(
     name = "basic_auth_lib",
     srcs = [
         "plugin.cc",
-        "@io_istio_proxy//extensions/common/wasm:base64.h",
+        "//extensions/common/wasm:base64.h",
     ],
     hdrs = [
         "plugin.h",
@@ -29,8 +28,8 @@ cc_library(
     deps = [
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
-        "@io_istio_proxy//extensions/common/wasm:json_util",
-        "@proxy_wasm_cpp_host//:lib",
+        "//extensions/common/wasm:json_util",
+        "@proxy_wasm_cpp_host//:null_lib",
     ],
 )
 

@@ -1,33 +1,51 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@io_istio_proxy//bazel:wasm.bzl", "wasm_dependencies")
-load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-load(
-    "@io_bazel_rules_docker//container:container.bzl",
-    "container_image",
-    "container_push",
-)
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push")
+
+def wasm_dependencies():
+    FLAT_BUFFERS_VERSION = "23.3.3"
+
+    http_archive(
+        name = "com_github_google_flatbuffers",
+        sha256 = "8aff985da30aaab37edf8e5b02fda33ed4cbdd962699a8e2af98fdef306f4e4d",
+        strip_prefix = "flatbuffers-" + FLAT_BUFFERS_VERSION,
+        url = "https://github.com/google/flatbuffers/archive/v" + FLAT_BUFFERS_VERSION + ".tar.gz",
+    )
+
+    http_file(
+        name = "com_github_nlohmann_json_single_header",
+        sha256 = "3b5d2b8f8282b80557091514d8ab97e27f9574336c804ee666fda673a9b59926",
+        urls = [
+            "https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp",
+        ],
+    )
 
 def wasm_libraries():
+    """
+    Loads the necessary libraries for WebAssembly modules.
+    """
+    ABSL_VERSION = "c8b33b0191a2db8364cacf94b267ea8a3f20ad83"
     http_archive(
         name = "com_google_absl",
-        sha256 = "ec8ef47335310cc3382bdc0d0cc1097a001e67dc83fcba807845aa5696e7e1e4",
-        strip_prefix = "abseil-cpp-302b250e1d917ede77b5ff00a6fd9f28430f1563",
-        url = "https://github.com/abseil/abseil-cpp/archive/302b250e1d917ede77b5ff00a6fd9f28430f1563.tar.gz",
+        sha256 = "a7803eac00bf68eae1a84ee3b9fcf0c1173e8d9b89b2cee92c7b487ea65be2a9",
+        strip_prefix = "abseil-cpp-" + ABSL_VERSION,
+        url = "https://github.com/abseil/abseil-cpp/archive/" + ABSL_VERSION + ".tar.gz",
     )
 
     # import json, base64, and flatbuffer library from istio proxy repo
     wasm_dependencies()
-
+    
     # import google test and cpp host for unit testing
+    GOOGLE_TEST_VERSION = "f8d7d77c06936315286eb55f8de22cd23c188571"
     http_archive(
         name = "com_google_googletest",
-        sha256 = "9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb",
-        strip_prefix = "googletest-release-1.10.0",
-        urls = ["https://github.com/google/googletest/archive/release-1.10.0.tar.gz"],
+        sha256 = "7ff5db23de232a39cbb5c9f5143c355885e30ac596161a6b9fc50c4538bfbf01",
+        strip_prefix = "googletest-" + GOOGLE_TEST_VERSION,
+        urls = ["https://github.com/google/googletest/archive/" + GOOGLE_TEST_VERSION + ".tar.gz"],
     )
 
-    PROXY_WASM_CPP_HOST_SHA = "f38347360feaaf5b2a733f219c4d8c9660d626f0"
-    PROXY_WASM_CPP_HOST_SHA256 = "bf10de946eb5785813895c2bf16504afc0cd590b9655d9ee52fb1074d0825ea3"
+    PROXY_WASM_CPP_HOST_SHA = "5d76116c449d6892b298b7ae79a84ef1cf5752bf"
+    PROXY_WASM_CPP_HOST_SHA256 = "a5825a1a5bbd5b0178c6189b227d5cf4370ac713a883b41f6a54edd768a03cb7"
 
     http_archive(
         name = "proxy_wasm_cpp_host",
@@ -37,17 +55,20 @@ def wasm_libraries():
     )
 
 def declare_wasm_image_targets(name, wasm_file):
-    # Rename to the spec compatible name.
-    copy_file("copy_original_file", wasm_file, "plugin.wasm")
-    container_image(
-        name = "wasm_image",
-        files = [":plugin.wasm"],
+    pkg_tar(
+        name = "wasm_tar",
+        srcs = [wasm_file],
+        package_dir = "./plugin.wasm",
     )
-    container_push(
+    oci_image(
+        name = "wasm_image",
+        architecture = "amd64",
+        os = "linux",
+        tars = [":wasm_tar"],
+    )
+    oci_push(
         name = "push_wasm_image",
-        format = "OCI",
         image = ":wasm_image",
-        registry = "ghcr.io",
-        repository = "istio-ecosystem/wasm-extensions/"+name,
-        tag = "$(WASM_IMAGE_TAG)",
+        repository = "ghcr.io/istio-ecosystem/wasm-extensions/"+name,
+        remote_tags = ["$(WASM_IMAGE_TAG)"],
     )

@@ -4,26 +4,41 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # Need to push Wasm OCI images
 http_archive(
-    name = "io_bazel_rules_docker",
-    sha256 = "92779d3445e7bdc79b961030b996cb0c91820ade7ffa7edca69273f404b085d5",
-    strip_prefix = "rules_docker-0.20.0",
-    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.20.0/rules_docker-v0.20.0.tar.gz"],
+    name = "rules_oci",
+    sha256 = "176e601d21d1151efd88b6b027a24e782493c5d623d8c6211c7767f306d655c8",
+    strip_prefix = "rules_oci-1.2.0",
+    url = "https://github.com/bazel-contrib/rules_oci/releases/download/v1.2.0/rules_oci-v1.2.0.tar.gz",
 )
 
-load(
-    "@io_bazel_rules_docker//repositories:repositories.bzl",
-    container_repositories = "repositories",
+load("@rules_oci//oci:dependencies.bzl", "rules_oci_dependencies")
+
+rules_oci_dependencies()
+
+load("@rules_oci//oci:repositories.bzl", "LATEST_CRANE_VERSION", "oci_register_toolchains")
+
+oci_register_toolchains(
+    name = "oci",
+    crane_version = LATEST_CRANE_VERSION,
 )
 
-container_repositories()
+# rules_pkg
+http_archive(
+    name = "rules_pkg",
+    sha256 = "451e08a4d78988c06fa3f9306ec813b836b1d076d0f055595444ba4ff22b867f",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.7.1/rules_pkg-0.7.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.7.1/rules_pkg-0.7.1.tar.gz",
+    ],
+)
 
-load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
-container_deps()
+rules_pkg_dependencies()
 
-PROXY_WASM_CPP_SDK_SHA = "fd0be8405db25de0264bdb78fae3a82668c03782"
+# proxy wasm cpp sdk
+PROXY_WASM_CPP_SDK_SHA = "95bb82ce45c41d9100fd1ec15d2ffc67f7f3ceee"
 
-PROXY_WASM_CPP_SDK_SHA256 = "c57de2425b5c61d7f630c5061e319b4557ae1f1c7526e5a51c33dc1299471b08"
+PROXY_WASM_CPP_SDK_SHA256 = "89792fc1abca331f29f99870476a04146de5e82ff903bdffca90e6729c1f2470"
 
 http_archive(
     name = "proxy_wasm_cpp_sdk",
@@ -32,26 +47,18 @@ http_archive(
     url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/" + PROXY_WASM_CPP_SDK_SHA + ".tar.gz",
 )
 
-load("@proxy_wasm_cpp_sdk//bazel/dep:deps.bzl", "wasm_dependencies")
+load("@proxy_wasm_cpp_sdk//bazel:repositories.bzl", "proxy_wasm_cpp_sdk_repositories")
 
-wasm_dependencies()
+proxy_wasm_cpp_sdk_repositories()
 
-load("@proxy_wasm_cpp_sdk//bazel/dep:deps_extra.bzl", "wasm_dependencies_extra")
+load("@proxy_wasm_cpp_sdk//bazel:dependencies.bzl", "proxy_wasm_cpp_sdk_dependencies")
 
-wasm_dependencies_extra()
+proxy_wasm_cpp_sdk_dependencies()
 
-### optional imports ###
-# To import commonly used libraries from istio proxy, such as base64, json, and flatbuffer.
-IO_ISTIO_PROXY_SHA = "c1a9b6219a8a95aa997a461d7d0ebcb9adbd4422"
+load("@proxy_wasm_cpp_sdk//bazel:dependencies_extra.bzl", "proxy_wasm_cpp_sdk_dependencies_extra")
 
-IO_ISTIO_PROXY_SHA256 = "d6dde583e97f31c73d6e3d9dcce4f981abfcc0dd132bcb385cf30c20921137ce"
+proxy_wasm_cpp_sdk_dependencies_extra()
 
-http_archive(
-    name = "io_istio_proxy",
-    sha256 = IO_ISTIO_PROXY_SHA256,
-    strip_prefix = "proxy-" + IO_ISTIO_PROXY_SHA,
-    url = "https://github.com/istio/proxy/archive/" + IO_ISTIO_PROXY_SHA + ".tar.gz",
-)
 
 load("@istio_ecosystem_wasm_extensions//bazel:wasm.bzl", "wasm_libraries")
 
