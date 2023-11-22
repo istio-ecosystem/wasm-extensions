@@ -2,3 +2,5 @@
 example/bazel-*
 zig-cache
 .vscode
+
+user.bazelrc
