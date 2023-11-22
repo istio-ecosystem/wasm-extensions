@@ -17,9 +17,9 @@
 
 licenses(["notice"])  # Apache 2
 
-load("@proxy_wasm_cpp_sdk//bazel/wasm:wasm.bzl", "wasm_cc_binary")
+load("@proxy_wasm_cpp_sdk//bazel:defs.bzl", "proxy_wasm_cc_binary")
 
-wasm_cc_binary(
+proxy_wasm_cc_binary(
     name = "stats.wasm",
     srcs = [
         "plugin.cc",
@@ -36,7 +36,6 @@ wasm_cc_binary(
         "//extensions/common/wasm:json_util",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
-        "@proxy_wasm_cpp_sdk//:proxy_wasm_intrinsics",
         "@proxy_wasm_cpp_sdk//contrib:contrib_lib",
         "@com_github_google_flatbuffers//:flatbuffers",
         "@com_github_google_flatbuffers//:runtime_cc",

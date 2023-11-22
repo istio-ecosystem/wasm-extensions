@@ -35,9 +35,10 @@ load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
 
-PROXY_WASM_CPP_SDK_SHA = "fd0be8405db25de0264bdb78fae3a82668c03782"
+# proxy wasm cpp sdk
+PROXY_WASM_CPP_SDK_SHA = "95bb82ce45c41d9100fd1ec15d2ffc67f7f3ceee"
 
-PROXY_WASM_CPP_SDK_SHA256 = "c57de2425b5c61d7f630c5061e319b4557ae1f1c7526e5a51c33dc1299471b08"
+PROXY_WASM_CPP_SDK_SHA256 = "89792fc1abca331f29f99870476a04146de5e82ff903bdffca90e6729c1f2470"
 
 http_archive(
     name = "proxy_wasm_cpp_sdk",
@@ -46,13 +47,17 @@ http_archive(
     url = "https://github.com/proxy-wasm/proxy-wasm-cpp-sdk/archive/" + PROXY_WASM_CPP_SDK_SHA + ".tar.gz",
 )
 
-load("@proxy_wasm_cpp_sdk//bazel/dep:deps.bzl", "wasm_dependencies")
+load("@proxy_wasm_cpp_sdk//bazel:repositories.bzl", "proxy_wasm_cpp_sdk_repositories")
 
-wasm_dependencies()
+proxy_wasm_cpp_sdk_repositories()
 
-load("@proxy_wasm_cpp_sdk//bazel/dep:deps_extra.bzl", "wasm_dependencies_extra")
+load("@proxy_wasm_cpp_sdk//bazel:dependencies.bzl", "proxy_wasm_cpp_sdk_dependencies")
 
-wasm_dependencies_extra()
+proxy_wasm_cpp_sdk_dependencies()
+
+load("@proxy_wasm_cpp_sdk//bazel:dependencies_extra.bzl", "proxy_wasm_cpp_sdk_dependencies_extra")
+
+proxy_wasm_cpp_sdk_dependencies_extra()
 
 
 load("@istio_ecosystem_wasm_extensions//bazel:wasm.bzl", "wasm_libraries")

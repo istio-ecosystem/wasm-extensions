@@ -86,7 +86,7 @@ cc_library(
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",
         "//extensions/common/wasm:json_util",
-        "@proxy_wasm_cpp_host//:lib",
+        "@proxy_wasm_cpp_host//:null_lib",
     ],
 )
 ```
