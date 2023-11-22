@@ -50,7 +50,6 @@ jobs:
 
     - name: Unit Test
       run: |
-        clang --version
         "${GITHUB_WORKSPACE}/bin/bazel" test --test_output=errors //...
 
     - name: Integration Test
