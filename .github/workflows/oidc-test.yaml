@@ -20,9 +20,11 @@ jobs:
           path: target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-    #! Commented out due to https://github.com/EmbarkStudios/cargo-deny-action/issues/68
-    #   - name: Cargo Deny
-    #     uses: EmbarkStudios/cargo-deny-action@v1
+
+      - name: Cargo Deny
+        uses: EmbarkStudios/cargo-deny-action@v1
+        with:
+          arguments: --manifest-path extensions/oidc/Cargo.toml
 
       - name: Run tests
         run: |

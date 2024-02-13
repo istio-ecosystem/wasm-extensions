@@ -29,13 +29,15 @@ jobs:
 
       - name: Run tests
         run: |
+          cd extensions/oidc
           rustc --version && cargo --version
           cargo clippy
           cargo test --workspace --verbose
 
-      #! Commented out due to https://github.com/EmbarkStudios/cargo-deny-action/issues/68
-      # - name: Cargo Deny
-      #   uses: EmbarkStudios/cargo-deny-action@v1
+      - name: Cargo Deny
+        uses: EmbarkStudios/cargo-deny-action@v1
+        with:
+          arguments: --manifest-path extensions/oidc/Cargo.toml
 
   build:
     needs: test
@@ -46,10 +48,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - run: cd extensions/oidc
-
       - name: Build
         run: |
+          cd extensions/oidc
           cargo build --target wasm32-wasi --release
 
       - name: Archive production artifacts
