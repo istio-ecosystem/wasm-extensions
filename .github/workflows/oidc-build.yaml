@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          path: 'extensions/oidc'
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -54,7 +56,7 @@ jobs:
           path: target/wasm32-wasi/release/wasm_oidc_plugin.wasm
 
   #! Commented out because of missing secrets
-  
+
   # docker-image:
   #   needs: test
   #   runs-on: ubuntu-latest
