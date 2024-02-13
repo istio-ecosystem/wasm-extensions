@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-            path: 'extensions/oidc'
+
+      - run: cd extensions/oidc
 
       - name: Cache dependencies
         uses: actions/cache@v2
