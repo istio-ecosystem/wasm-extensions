@@ -1,0 +1,64 @@
+# Alternative 2: Use pre-built [Docker-Image](https://hub.docker.com/r/antonengelhardt/wasm-oidc-plugin) from Docker Hub
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: example-app
+  namespace: example-namespace
+  labels:
+    app: example-app
+
+spec:
+  selector:
+    matchLabels:
+      app: example-envoy
+  replicas: 1
+
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+        app: example-app
+
+    spec:
+      containers:
+        - name: envoy
+          image: antonengelhardt/wasm-oidc-plugin:latest
+
+          resources:
+            requests:
+              cpu: 50Mi
+              memory: 80Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
+
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /etc/envoy/envoy.yaml
+              subPath: envoy.yaml
+
+          ports:
+            - containerPort: 10000
+              name: http
+              protocol: TCP
+
+          command:
+            ["envoy", "-c", "/etc/envoy/envoy.yaml", "--concurrency", "1"]
+
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: example-envoy-config
+            defaultMode: 420
+            items:
+              - key: envoy.yaml
+                path: envoy.yaml
+
+      restartPolicy: Always

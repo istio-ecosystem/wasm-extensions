@@ -1,0 +1,48 @@
+[package]
+publish = false
+name = "wasm-oidc-plugin"
+version = "0.3.3"
+authors = ["WWU Cloud Developer <cloud@uni-muenster.de>, Anton Engelhardt <antoncengelhardt@icloud.com>"]
+description = "WASM OIDC Envoy Plugin"
+license = "Apache-2.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# logging
+log = "0.4.20"
+
+# proxy-wasm
+proxy-wasm = "0.2.1"
+
+# json, yaml & url parsing
+url = "2.5.0"
+serde = { version = "1.0.196", features = ["derive"] }
+serde_yaml = "0.9.31"
+serde_json = "1.0.113"
+serde_urlencoded = "0.7.1"
+
+# base64
+base64 = "0.21.7"
+
+# regex
+regex = "1.10.3"
+serde_regex = "1.1.0"
+
+# jsonwebtoken (forked version to support RSA keys longer than 4096 bits)
+jwt-simple = {git = "https://github.com/antonengelhardt/rust-jwt-simple", rev = "b92ac707dab1f65fae00569a468793d5eb6dab22"}
+
+# pkce
+pkce = "0.2.0"
+
+# aes256
+aes-gcm = "0.10.3"
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
+panic = "abort"
+strip = "debuginfo"

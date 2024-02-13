@@ -1,0 +1,101 @@
+static_resources:
+  listeners:
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 10000
+    filter_chains:
+      - filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+              stat_prefix: ingress_http
+              codec_type: AUTO
+              route_config:
+                name: local_routes
+                virtual_hosts:
+                  - name: local_service
+                    domains:
+                      - "*"
+                    routes:
+                      - match:
+                          prefix: "/"
+                        route:
+                          cluster: httpbin
+              http_filters:
+                - name: envoy.filters.http.wasm
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+                    config:
+                      name: "wasm-oidc-plugin"
+                      configuration:
+                        "@type": "type.googleapis.com/google.protobuf.StringValue"
+                        value: |
+                          config_endpoint: "https://accounts.google.com/.well-known/openid-configuration"
+                          reload_interval_in_h: 1 # in hours
+
+                          exclude_hosts: [] # or ["httpbin.org"]
+                          exclude_paths: [] # or ["/favicon.ico"]
+                          exclude_urls: [] # or ["http://localhost:10000/#/HTTP_Methods/get_get"]
+
+                          access_token_header_name: # or "Authorization"
+                          access_token_header_prefix: "Bearer "
+                          id_token_header_name: # or "X-Id-Token"
+                          id_token_header_prefix: "Bearer "
+
+                          cookie_name: "oidcSession" # max. 32 characters
+                          filter_plugin_cookies: true # or false
+                          cookie_duration: 86400 # in seconds
+                          token_validation: true # or false
+                          aes_key: "i-am-a-forty-four-characters-long-string-key" # generate with `openssl rand -base64 32`
+
+                          authority: "accounts.google.com" # FQDN of the OIDC provider
+                          redirect_uri: "http://localhost:10000/oidc/callback" # redirect uri that is registered with the OIDC provider
+                          client_id: "wasm-oidc-plugin" # client id that is registered with the OIDC provider
+                          scope: "openid profile email"
+                          claims: "{\"id_token\":{\"groups\":null,\"username\":null}}"
+
+                          client_secret: "redacted"
+                          audience: "wasm-oidc-plugin"
+                      vm_config:
+                        runtime: "envoy.wasm.runtime.v8"
+                        code:
+                          local:
+                            filename: "/etc/envoy/proxy-wasm-plugins/wasm_oidc_plugin.wasm"
+                - name: envoy.filters.http.router
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+  clusters:
+    - name: httpbin
+      connect_timeout: 5s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: httpbin
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: httpbin
+                      port_value: 80
+                  hostname: "httpbin.org"
+    - name: oidc
+      connect_timeout: 5s
+      type: LOGICAL_DNS
+      dns_lookup_family: V4_ONLY
+      load_assignment:
+        cluster_name: oidc
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: accounts.google.com
+                      port_value: 443
+                  # hostname: "accounts.google.com"
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+          sni: "accounts.google.com"

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: example-certificate
+  namespace: example-namespace
+spec:
+  secretName: example-tls
+  issuerRef:
+    name: letsencrypt-production #! this is the name of the issuer of cert-manager
+    kind: ClusterIssuer
+  commonName: your-domain.com #! this is the domain name you want to use
+  dnsNames:
+    - your-domain.com

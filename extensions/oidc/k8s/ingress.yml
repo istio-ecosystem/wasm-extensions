@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  namespace: example-namespace
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: your-domain.com #! this is the domain name you want to use
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: example-service #! this name must match the name of the service in the service.yml
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - your-domain.com #! this is the domain name you want to use
+      secretName: example-tls #! this name must match the name of the secret in the certificate-production.yml

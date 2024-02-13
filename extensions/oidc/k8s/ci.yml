@@ -1,0 +1,70 @@
+name: Test, Build and Deploy Wasm Plugin
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    container:
+      image: antonengelhardt/rust-docker-tools
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run tests
+        run: |
+          rustc --version && cargo --version
+          cargo clippy
+          cargo test --workspace --verbose
+
+      - name: Cargo Deny
+        uses: EmbarkStudios/cargo-deny-action@v1
+
+  build:
+    name: Build
+    needs: test
+    runs-on: ubuntu-latest
+    container:
+      image: antonengelhardt/rust-docker-tools
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          cargo build --target wasm32-wasi --release
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: name-of-your-wasm-plugin.wasm #! Rename, if necessary
+          path: target/wasm32-wasi/release/name_of_your_wasm_plugin.wasm #! Rename, if necessary
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} #! Here i have used a K8s Cluster managed by DigitalOcean. You can use any other K8s Cluster as well, but you need to provide the kubeconfig in a secret.
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 <name-of-your-cluster> #! Applies for DigitalOcean only: https://docs.digitalocean.com/products/kubernetes/how-to/deploy-using-github-actions/
+
+      - name: Deploy to Kubernetes
+        run: kubectl rollout restart deployment example-app -n example-namespace # Trigger a rollout of the deployment to update the plugin.

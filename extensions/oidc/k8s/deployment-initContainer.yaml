@@ -1,0 +1,90 @@
+# Alternative 1: Build Plugin in a initContainer
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: example-app
+  namespace: example-namespace
+  labels:
+    app: example-app
+
+spec:
+  selector:
+    matchLabels:
+      app: example-envoy
+  replicas: 1
+
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+        app: example-app
+
+    spec:
+      initContainers:
+        - name: build-plugin
+          image: antonengelhardt/rust-docker-tools:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              apk add git
+              git clone https://${GITHUB_PAT}@github.com/your-org/your-repo.git #! Change URL
+              cd your-repo #! Change directory
+              cargo build --target wasm32-wasi --release
+              cp target/wasm32-wasi/release/name_of_your_wasm_plugin.wasm /plugins/name_of_your_wasm_plugin.wasm #! Rename, if necessary
+
+          env:
+            - name: GITHUB_PAT #? if your repo is private, you need to provide a github personal access token in a secret
+              valueFrom:
+                secretKeyRef:
+                  name: github-pat
+                  key: password
+
+          volumeMounts:
+            - name: plugins
+              mountPath: /plugins
+
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:v1.29-latest
+
+          resources:
+            requests:
+              cpu: 50Mi
+              memory: 80Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
+
+          volumeMounts:
+            - name: plugins
+              mountPath: /etc/envoy/proxy-wasm-plugins
+            - name: envoy-config
+              mountPath: /etc/envoy
+
+          ports:
+            - containerPort: 10000
+              name: http
+              protocol: TCP
+
+          command:
+            ["envoy", "-c", "/etc/envoy/envoy.yaml", "--concurrency", "1"]
+
+      volumes:
+        - name: plugins
+          emptyDir: {}
+        - name: envoy-config
+          configMap:
+            name: example-envoy-config
+            items:
+              - key: envoy.yaml
+                path: envoy.yaml
+
+      restartPolicy: Always
