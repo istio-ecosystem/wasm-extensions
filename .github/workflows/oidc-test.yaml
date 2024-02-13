@@ -24,7 +24,7 @@ jobs:
       - name: Cargo Deny
         uses: EmbarkStudios/cargo-deny-action@v1
         with:
-          arguments: --manifest-path extensions/oidc/Cargo.toml
+          manifest-path: extensions/oidc/Cargo.toml
 
       - name: Run tests
         run: |
