@@ -33,8 +33,9 @@ jobs:
           cargo clippy
           cargo test --workspace --verbose
 
-      - name: Cargo Deny
-        uses: EmbarkStudios/cargo-deny-action@v1
+      #! Commented out due to https://github.com/EmbarkStudios/cargo-deny-action/issues/68
+      # - name: Cargo Deny
+      #   uses: EmbarkStudios/cargo-deny-action@v1
 
   build:
     needs: test

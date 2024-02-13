@@ -1,4 +1,4 @@
-name: Test
+name: Test Rust
 
 on:
   pull_request:
@@ -14,19 +14,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - run: cd extensions/oidc
-
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
           path: target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Cargo Deny
-        uses: EmbarkStudios/cargo-deny-action@v1
+    #! Commented out due to https://github.com/EmbarkStudios/cargo-deny-action/issues/68
+    #   - name: Cargo Deny
+    #     uses: EmbarkStudios/cargo-deny-action@v1
 
       - name: Run tests
         run: |
+          cd extensions/oidc
           rustc --version && cargo --version
           cargo clippy
           cargo test --workspace --verbose
