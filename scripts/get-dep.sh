@@ -50,7 +50,7 @@ trap "rm -rf ${ISTIO_PROXY_TMP_DIR}" EXIT
 pushd ${ISTIO_PROXY_TMP_DIR} > /dev/null
 
 if [[ ${RELEASE} == "master" ]]; then
-  git clone --depth=1 --branch master https://github.com/istio/proxy 2> /dev/null
+  git clone --depth=1 --branch main https://github.com/istio/proxy 2> /dev/null
 else
   git clone --depth=1 --branch release-${RELEASE} https://github.com/istio/proxy 2> /dev/null
 fi
